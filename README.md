@@ -1,0 +1,1 @@
+# commercetools-b2b-machinery-store2
