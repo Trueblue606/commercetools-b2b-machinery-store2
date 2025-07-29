@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@commercetools/sdk-client": "^4.0.1",
+    "@commercetools/sdk-middleware-auth": "^8.0.1",
+    "@commercetools/sdk-middleware-http": "^8.0.1"
+  }
+}
