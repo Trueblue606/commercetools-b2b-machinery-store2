@@ -1,7 +1,13 @@
 {
   "dependencies": {
+    "@commercetools/platform-sdk": "^8.13.0",
     "@commercetools/sdk-client": "^4.0.1",
     "@commercetools/sdk-middleware-auth": "^8.0.1",
-    "@commercetools/sdk-middleware-http": "^8.0.1"
+    "@commercetools/sdk-middleware-http": "^8.0.1",
+    "dotenv": "^17.2.1",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.5",
+    "react-icons": "^5.5.0",
+    "uuid": "^11.1.0"
   }
 }
