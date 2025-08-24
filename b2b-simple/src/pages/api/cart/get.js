@@ -7,11 +7,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { id } = req.query;
+    const id = req.query.id || req.query.cartId;
     if (!id) return res.status(400).json({ error: "Cart ID required" });
 
     const apiRoot = getApiRoot();
     const result = await apiRoot.carts().withId({ ID: id }).get().execute();
+
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
 
     return res.status(200).json(result.body);
   } catch (err) {

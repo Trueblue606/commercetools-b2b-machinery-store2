@@ -1,4 +1,4 @@
-// lib/ct.js
+// lib/ct-rest.js - REST helpers for commercetools
 import { getCTToken } from "./ctAuth.js";
 
 const CT_HOST = process.env.CT_HOST;

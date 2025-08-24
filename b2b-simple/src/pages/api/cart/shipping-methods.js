@@ -3,6 +3,7 @@ import { API } from "../../../../lib/ct-rest.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
 
   const { cartId } = req.query || {};
   if (!cartId) return res.status(400).json({ error: "Missing cartId" });
