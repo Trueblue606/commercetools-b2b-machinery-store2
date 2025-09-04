@@ -1,12 +1,12 @@
 // pages/account.js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from './components/navbar';
-import AccountHeader from './components/AccountHeader';
-import AccountTabs from './components/AccountTabs';
-import DashboardContent from './components/DashboardContent';
-import OrdersContent from './components/OrdersContent';
-import LoadingSpinner from './components/LoadingSpinner';
+import Navbar from '@/components/navbar';
+import AccountHeader from '@/components/AccountHeader';
+import AccountTabs from '@/components/AccountTabs';
+import DashboardContent from '@/components/DashboardContent';
+import OrdersContent from '@/components/OrdersContent';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 
 export const COLORS = {

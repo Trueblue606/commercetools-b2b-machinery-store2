@@ -376,3 +376,4 @@ function ProductVariantsSelector({ product, onVariantChange, customer }) {
     </div>
   );
 }
+export default function __noop(){ return null }

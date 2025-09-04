@@ -1,4 +1,4 @@
-import { ctFetch } from "@/lib/ct-rest";
+import { ctFetch } from '@/lib/ct-fetch';
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

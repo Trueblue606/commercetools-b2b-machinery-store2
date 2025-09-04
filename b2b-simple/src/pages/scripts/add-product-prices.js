@@ -80,3 +80,4 @@ async function addPricesForAllProducts() {
 
 // Run the script
 addPricesForAllProducts();
+export default function __noop(){ return null }

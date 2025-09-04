@@ -328,3 +328,5 @@ export function CartProvider({ children }) {
 export function useCart() {
   return useContext(CartContext);
 }
+
+export default function __noop(){ return null }

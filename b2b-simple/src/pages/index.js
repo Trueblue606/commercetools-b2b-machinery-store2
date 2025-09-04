@@ -1,9 +1,9 @@
 // pages/index.js
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from './components/navbar';
-import FiltersSidebar from './components/FiltersSidebar';
-import SearchBar from './components/SearchBar';
+import Navbar from '@/components/navbar';
+import FiltersSidebar from '@/components/FiltersSidebar';
+import SearchBar from '@/components/SearchBar';
 
 const PRICE_CURRENCY = process.env.NEXT_PUBLIC_CT_PRICE_CURRENCY || 'GBP';
 const PRICE_COUNTRY = process.env.NEXT_PUBLIC_CT_PRICE_COUNTRY || 'GB';

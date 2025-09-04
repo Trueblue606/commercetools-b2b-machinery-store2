@@ -1,4 +1,4 @@
-import { ctFetch } from '@/lib/ct-rest';
+import { ctFetch } from '@/lib/ct-fetch';
 import { sendCtError } from '../cart/_utils/ctErrors';
 
 /**

@@ -1,7 +1,7 @@
 // src/pages/checkout.js - Dynamic Shipping Methods + Prefill + Place Order
 import { useEffect, useState, useCallback } from "react";
 import { useCart } from "./contexts/CartContext";
-import Navbar from "./components/navbar";
+import Navbar from "@/components/navbar";
 import { useRouter } from "next/router";
 
 export default function Checkout() {

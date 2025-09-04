@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Navbar from './components/navbar';
+import Navbar from '@/components/navbar';
 import { useCart } from './contexts/CartContext';
 
 export default function Cart() {

@@ -1,7 +1,7 @@
 // src/pages/product/[id].jsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Navbar from '../components/navbar';
+import Navbar from '@/components/navbar';
 import { useCart } from '../contexts/CartContext';
 import { getCTToken } from '../../../lib/ctAuth.js';
 import { API } from '../../../lib/ct-rest.js';

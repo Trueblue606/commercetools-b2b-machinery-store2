@@ -1,7 +1,7 @@
 // pages/account/orders/[id].js
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Navbar from "../../components/navbar";
+import Navbar from "@/components/navbar";
 
 const DARK_BLUE = "#0d2340";
 

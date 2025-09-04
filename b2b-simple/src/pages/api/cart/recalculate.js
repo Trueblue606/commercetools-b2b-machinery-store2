@@ -1,5 +1,5 @@
 import { sendCtError } from './_utils/ctErrors';
-import { ctFetch } from '@/lib/ct-rest';
+import { ctFetch } from '@/lib/ct-fetch';
 
 /**
  * Recalculate cart prices / selections after customer group change.

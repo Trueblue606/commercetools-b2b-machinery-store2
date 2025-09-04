@@ -10,3 +10,5 @@ export async function parseBody(req) {
     return {};
   }
 }
+
+export default function __noop(){ return null }

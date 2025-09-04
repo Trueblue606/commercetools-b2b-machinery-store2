@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Navbar from './components/navbar';
+import Navbar from '@/components/navbar';
 
 export default function PriceTest({ product }) {
   const [customer, setCustomer] = useState(null);
