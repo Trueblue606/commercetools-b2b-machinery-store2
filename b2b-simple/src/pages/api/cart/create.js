@@ -1,40 +1,33 @@
 // src/pages/api/cart/create.js
-import { getApiRoot } from "@/pages/utils/ct-sdk";
+import { getCTToken } from "../../../../lib/ctAuth.js";
+import { ctPost } from "../../../../lib/ct-rest.js";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const { currency = "GBP", customerGroupId, customerStoreKey, country = "GB" } = req.body || {};
+    const bodyIn = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {});
+    const { currency = "GBP", customerGroupId, customerStoreKey, country = "GB" } = bodyIn;
 
-    if (!currency) {
-      return res.status(400).json({ error: "currency is required" });
+    if (!currency) return res.status(400).json({ error: "currency is required" });
+
+    const { access_token } = await getCTToken();
+
+    const draft = { currency, country };
+    if (customerGroupId) draft.customerGroup = { typeId: "customer-group", id: customerGroupId };
+    if (customerStoreKey) draft.store = { key: customerStoreKey };
+
+    try {
+      const created = await ctPost(`/carts`, draft, access_token);
+      return res.status(200).json(created);
+    } catch (e) {
+      if (e?.status === 409) {
+        const created = await ctPost(`/carts`, draft, access_token);
+        return res.status(200).json(created);
+      }
+      return res.status(e?.status || 500).json(e?.body || { error: e?.message || "Cart create failed" });
     }
-
-    const apiRoot = getApiRoot();
-
-    const body = {
-      currency,
-      country,
-    };
-
-    // ✅ Attach customerGroup if passed
-    if (customerGroupId) {
-      body.customerGroup = { typeId: "customer-group", id: customerGroupId };
-    }
-
-    // ✅ Attach store if customer has a store
-    if (customerStoreKey) {
-      body.store = { key: customerStoreKey };
-    }
-
-    const result = await apiRoot.carts().post({ body }).execute();
-
-    return res.status(200).json(result.body);
   } catch (err) {
-    console.error("Cart create error:", err);
     return res.status(500).json({ error: err.message || "Cart create failed" });
   }
 }

@@ -1,5 +1,5 @@
 // src/pages/api/products/get-prices.js
-import { getApiRoot } from "@/pages/utils/ct-sdk";
+import { ctFetch } from "@/lib/ct-rest";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -12,17 +12,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing ?id=PRODUCT_ID query param" });
     }
 
-    const apiRoot = getApiRoot();
-
-    // Fetch product by ID
-    const result = await apiRoot.products().withId({ ID: id }).get().execute();
-
-    const product = result.body;
+  // Fetch product by ID via REST
+  const product = await ctFetch(`/products/${encodeURIComponent(id)}`);
 
     // Extract prices from all variants
     const allVariants = [
-      product.masterData.current.masterVariant,
-      ...(product.masterData.current.variants || []),
+  product.masterData?.current?.masterVariant || product.masterVariant,
+  ...((product.masterData?.current?.variants) || product.variants || []),
     ];
 
     const prices = allVariants.flatMap((variant) =>

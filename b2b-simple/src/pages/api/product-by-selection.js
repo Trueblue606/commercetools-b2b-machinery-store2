@@ -9,36 +9,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1) Get OAuth token
-    const authRes = await fetch(
-      "https://auth.eu-central-1.aws.commercetools.com/oauth/token",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${Buffer.from(
-            process.env.CT_CLIENT_ID + ":" + process.env.CT_CLIENT_SECRET
-          ).toString("base64")}`,
-        },
-        body: "grant_type=client_credentials",
-      }
-    );
-
-    if (!authRes.ok) {
-      console.error("Auth failed:", authRes.status);
-      return res.status(500).json({ error: "Authentication failed" });
-    }
-
-    const auth = await authRes.json();
+  const { getCTToken } = await import('../../../lib/ctAuth.js');
+  const { API } = await import('../../../lib/ct-rest.js');
+    const { access_token } = await getCTToken();
 
     // 2) Fetch customer group ID (if customerEmail is provided)
     let customerGroupId = null;
     if (customerEmail) {
       const custRes = await fetch(
-        `https://api.eu-central-1.aws.commercetools.com/${process.env.CT_PROJECT_KEY}/customers?where=email="${customerEmail}"`,
-        {
-          headers: { Authorization: `Bearer ${auth.access_token}` },
-        }
+        API(`/customers?where=email="${customerEmail}"`),
+        { headers: { Authorization: `Bearer ${access_token}` } }
       );
       if (custRes.ok) {
         const customerData = await custRes.json();
@@ -52,10 +32,8 @@ export default async function handler(req, res) {
 
     // 3) Get products in the selection
     const productsRes = await fetch(
-      `https://api.eu-central-1.aws.commercetools.com/${process.env.CT_PROJECT_KEY}/product-selections/${selectionId}/products?limit=100`,
-      {
-        headers: { Authorization: `Bearer ${auth.access_token}` },
-      }
+      API(`/product-selections/${selectionId}/products?limit=100`),
+      { headers: { Authorization: `Bearer ${access_token}` } }
     );
 
     if (!productsRes.ok) {
@@ -71,9 +49,7 @@ export default async function handler(req, res) {
 
     // 4) Fetch product projections with customer group pricing
     const whereClause = productIds.map((id) => `"${id}"`).join(",");
-    const searchUrl = new URL(
-      `https://api.eu-central-1.aws.commercetools.com/${process.env.CT_PROJECT_KEY}/product-projections/search`
-    );
+  const searchUrl = new URL(API(`/product-projections/search`));
     searchUrl.searchParams.set("filter", `id:(${whereClause})`);
     if (customerGroupId) {
       searchUrl.searchParams.set("priceCustomerGroup.id", customerGroupId);
@@ -81,7 +57,7 @@ export default async function handler(req, res) {
     searchUrl.searchParams.set("limit", "100");
 
     const productProjectionsRes = await fetch(searchUrl.toString(), {
-      headers: { Authorization: `Bearer ${auth.access_token}` },
+      headers: { Authorization: `Bearer ${access_token}` },
     });
 
     if (!productProjectionsRes.ok) {

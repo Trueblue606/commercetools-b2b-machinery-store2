@@ -1,53 +1,59 @@
-import { useState, useEffect, useRef } from 'react';
+// src/components/navbar.js
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '../contexts/CartContext';
 
 export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
   const [customer, setCustomer] = useState(null);
-  const { cart, itemCount, setCartCustomer } = useCart(); // ✅ added cart
-  const didInitRef = useRef(false);
+  const { cart, itemCount, setCartCustomer } = useCart();
 
+  // 🔄 Restore customer + ensure cart is linked
   useEffect(() => {
-    if (didInitRef.current) return;
-    didInitRef.current = true;
-
     const stored = localStorage.getItem('customer');
-    if (stored && cart) { // ✅ wait for cart
+    if (!stored) return;
+
+    try {
       const customerData = JSON.parse(stored);
       setCustomer(customerData);
 
-      setCartCustomer(
-        cart.id,
-        customerData.id, // commercetools customerId
-        customerData.customerGroup?.id ||
-          customerData.effectiveGroupId ||
-          (Array.isArray(customerData.customerGroupAssignments)
-            ? customerData.customerGroupAssignments[0]?.id
-            : null)
-      );
+      if (cart && !cart.customerId) {
+        setCartCustomer(
+          cart.id,
+          customerData.id,
+          customerData.customerGroup?.id ||
+            customerData.effectiveGroupId ||
+            (Array.isArray(customerData.customerGroupAssignments)
+              ? customerData.customerGroupAssignments[0]?.id
+              : null)
+        );
+      }
+    } catch (e) {
+      console.error('Failed to parse stored customer', e);
     }
-  }, []);
+  }, [cart, setCartCustomer]);
 
   const handleLogout = () => {
     localStorage.removeItem('customer');
     setCustomer(null);
     if (cart) {
-      setCartCustomer(cart.id, null, null); // reset
+      setCartCustomer(cart.id, null, null); // reset link
     }
     window.location.href = '/';
   };
 
+  // ✅ Group ID mapping
   const groupMap = {
-    'b2b1bafe-e36b-4d95-93c5-82ea07d7e159': { key: 'contractpricing', label: 'Contract' },
-    '48627f63-30a3-47d8-8d3d-4b1c30787a8a': { key: 'asm', label: 'ASM' },
-    '5db880e5-3e15-4cc0-9cd1-2b214dd53f23': { key: 'catalogue', label: 'Catalogue' },
+    'd7a14b96-ca48-4a3f-b35d-6bce624e3b16': { key: 'standard', label: 'Standard' },
+    'fc05910d-ec00-4d7a-abaa-967d352af9fc': { key: 'testoverlap', label: 'Test Overlap' },
+    '68baca5b-b96b-4751-9f85-215fb1a7417c': { key: 'special', label: 'Special Project' },
+    'a1aff334-3def-4937-9116-5f2f96f93214': { key: 'distributor', label: 'Distributor' },
+    '20304c81-f448-4c7e-9231-ba55488251e5': { key: 'contractA', label: 'Contract A' },
   };
 
   const getCustomerGroup = () => {
-    if (!customer) return { key: 'catalogue', label: 'Catalogue' };
+    if (!customer) return null;
 
     const ids = [];
-
     if (customer.effectiveGroupId) ids.push(customer.effectiveGroupId);
     if (customer.customerGroup?.id) ids.push(customer.customerGroup.id);
     if (Array.isArray(customer.customerGroupAssignments)) {
@@ -61,7 +67,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
       if (groupMap[id]) return groupMap[id];
     }
 
-    return { key: 'catalogue', label: 'Catalogue' };
+    return null;
   };
 
   const customerGroup = getCustomerGroup();
@@ -165,14 +171,6 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
               textDecoration: 'none',
               color: '#0d2340',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#d7e9f7';
-              e.currentTarget.style.borderColor = '#0d2340';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#d7e9f7';
-            }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="9" cy="21" r="1"></circle>
@@ -240,7 +238,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                     {customer.firstName}
                   </div>
                   <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                    {customerGroup.label}
+                    {customerGroup?.label || 'Member'}
                   </div>
                 </div>
               </Link>
@@ -265,7 +263,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
                   <line x1="21" y1="12" x2="9" y2="12" />
                 </svg>
@@ -293,7 +291,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                 🎯 {customerGroup.label} Pricing Active
               </span>
               <span style={{ fontSize: '13px', color: '#0d2340' }}>
-                • {customerGroup.key === 'contractpricing' ? 'Contract pricing applied' : 'Standard pricing'}
+                • {customerGroup.key === 'contractA' ? 'Contract pricing applied' : 'Standard pricing'}
               </span>
               <span style={{ fontSize: '13px', color: '#0d2340' }}>• Free Shipping on Orders Over £500</span>
             </div>

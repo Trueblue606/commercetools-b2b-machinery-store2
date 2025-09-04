@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "extract:keys-inventory": "node extract-keys-inventory.js products.json keys-inventory.csv"
+  },
   "dependencies": {
     "@commercetools/platform-sdk": "^8.13.0",
     "@commercetools/sdk-client": "^4.0.1",

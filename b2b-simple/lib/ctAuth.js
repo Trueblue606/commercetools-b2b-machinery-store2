@@ -1,9 +1,7 @@
-/* lib/ctAuth.js */
-/* eslint-disable no-console */
-
 // lib/ctAuth.js
 let cache = { token: null, exp: 0 };
 
+// Named export: use with `import { getCTToken } from '../../../lib/ctAuth.js'`
 export async function getCTToken() {
   if (cache.token && Date.now() < cache.exp - 60_000) {
     return {
@@ -13,7 +11,7 @@ export async function getCTToken() {
     };
   }
 
-  const HOST = process.env.CT_HOST;              // eu-central-1.aws.commercetools.com
+  const HOST = process.env.CT_HOST;
   const PROJECT_KEY = process.env.CT_PROJECT_KEY;
   const CLIENT_ID = process.env.CT_CLIENT_ID;
   const CLIENT_SECRET = process.env.CT_CLIENT_SECRET;

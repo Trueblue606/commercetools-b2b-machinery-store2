@@ -1,54 +1,59 @@
 // lib/ct-rest.js - REST helpers for commercetools
-import { getCTToken } from "./ctAuth.js";
 
-const CT_HOST = process.env.CT_HOST;
-const CT_PROJECT_KEY = process.env.CT_PROJECT_KEY;
+// Canonical REST helper for commercetools. Single source of truth.
 
-function assertEnv() {
-  if (!CT_HOST) throw new Error("Missing env CT_HOST");
-  if (!CT_PROJECT_KEY) throw new Error("Missing env CT_PROJECT_KEY");
+export const API = (p = "") =>
+	`https://api.${process.env.CT_HOST}/${process.env.CT_PROJECT_KEY}${p}`;
+
+// Build price-selection query params
+export function buildPriceSelection({ customerGroupId, priceCountry, priceCurrency } = {}) {
+	const country = priceCountry || process.env.NEXT_PUBLIC_CT_PRICE_COUNTRY || "GB";
+	const currency = priceCurrency || process.env.NEXT_PUBLIC_CT_PRICE_CURRENCY || "GBP";
+	const sp = new URLSearchParams();
+	if (country) sp.set("priceCountry", country);
+	if (currency) sp.set("priceCurrency", currency);
+	if (customerGroupId) sp.set("priceCustomerGroup.id", customerGroupId);
+	return sp;
 }
 
-export function API(path) {
-  assertEnv();
-  if (!path.startsWith("/")) path = `/${path}`;
-  return `https://api.${CT_HOST}/${CT_PROJECT_KEY}${path}`;
+async function parseJsonSafe(res) {
+	const text = await res.text().catch(() => "");
+	try {
+		return text ? JSON.parse(text) : null;
+	} catch {
+		return null;
+	}
 }
 
 async function ctFetch(method, path, body, token) {
-  assertEnv();
-  const authToken = token || (await getCTToken());
-  const res = await fetch(API(path), {
-    method,
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-    body: body ? JSON.stringify(body) : undefined,
-  });
+	const res = await fetch(API(path), {
+		method,
+		headers: {
+			Authorization: `Bearer ${token}`,
+			"Content-Type": "application/json",
+		},
+		body: body !== undefined ? JSON.stringify(body) : undefined,
+		cache: "no-store",
+	});
 
-  if (!res.ok) {
-    const text = await res.text();
-    let parsed;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      parsed = text;
-    }
-    const err = new Error(`CT ${res.status} ${res.statusText}`);
-    err.status = res.status;
-    err.body = parsed;
-    throw err;
-  }
-  return res.json();
+	const json = await parseJsonSafe(res);
+	if (!res.ok) {
+		throw Object.assign(new Error(`CT ${method} ${path} failed`), {
+			status: res.status,
+			body: json,
+		});
+	}
+	return json ?? {};
 }
 
-export async function ctGet(path, token) {
-  return ctFetch("GET", path, undefined, token);
+export function ctGet(path, token) {
+	return ctFetch("GET", path, undefined, token);
 }
 
-export async function ctPost(path, body, token) {
-  return ctFetch("POST", path, body, token);
+export function ctPost(path, body, token) {
+	return ctFetch("POST", path, body, token);
 }
+
+// Optional helpers if you ever need them:
+// export function ctDelete(path, token) { return ctFetch("DELETE", path, undefined, token); }
+// export function ctPatch(path, body, token) { return ctFetch("PATCH", path, body, token); }

@@ -1,6 +1,5 @@
 // /b2b-simple/src/pages/api/orders/create.js
-import { getApiRoot } from '@/pages/utils/ct-sdk';
-import { sendFromCtSdk, sendCtError } from '../cart/_utils/ctErrors';
+import { sendCtError } from '../cart/_utils/ctErrors';
 
 /**
  * Creates an Order from a Cart.
@@ -28,7 +27,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, message: 'Missing cartId or cartVersion' });
     }
 
-    const apiRoot = getApiRoot();
+  // Note: This file delegates to ../order/create at bottom; keeping legacy logic for reference
 
     // 1) Optionally set addresses on the cart (idempotent if unchanged)
     let currentVersion = cartVersion;
@@ -37,17 +36,7 @@ export default async function handler(req, res) {
     if (billingAddress) actions.push({ action: 'setBillingAddress', address: billingAddress });
 
     if (actions.length > 0) {
-      const updateResp = await apiRoot
-        .carts()
-        .withId({ ID: cartId })
-        .post({ body: { version: currentVersion, actions } })
-        .execute();
-
-      if (updateResp.statusCode >= 400) {
-        // Forward CT error JSON (e.g., 409 ConcurrentModification)
-        return sendFromCtSdk(res, updateResp);
-      }
-      currentVersion = updateResp.body.version;
+  // REST equivalent lives in ../order/create
     }
 
     // 2) Create Order from Cart
@@ -59,13 +48,7 @@ export default async function handler(req, res) {
       orderState: 'Open',
     };
 
-    const orderResp = await apiRoot.orders().post({ body: orderDraft }).execute();
-
-    if (orderResp.statusCode >= 400) {
-      return sendFromCtSdk(res, orderResp);
-    }
-
-    const order = orderResp.body;
+  const order = null; // not used, see re-export below
 
     // 3) Reply with a compact, consistent JSON shape
     return res.status(200).json({
@@ -83,3 +66,6 @@ export default async function handler(req, res) {
     return sendCtError(res, err);
   }
 }
+
+// Delegate to the REST implementation at /api/order/create (singular)
+export { default } from "../order/create";

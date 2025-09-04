@@ -1,5 +1,5 @@
-import { getApiRoot } from '@/pages/utils/ct-sdk';
-import { sendFromCtSdk, sendCtError } from './_utils/ctErrors';
+import { ctFetch } from '@/lib/ct-rest';
+import { sendCtError } from './_utils/ctErrors';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -14,23 +14,14 @@ export default async function handler(req, res) {
         .json({ message: 'Missing cartId, version, lineItemId, or quantity' });
     }
 
-    const apiRoot = getApiRoot();
-    const resp = await apiRoot
-      .carts()
-      .withId({ ID: cartId })
-      .post({
-        body: {
-          version,
-          actions: [{ action: 'changeLineItemQuantity', lineItemId, quantity }],
-        },
-      })
-      .execute();
-
-    if (resp.statusCode >= 400) {
-      return sendFromCtSdk(res, resp);
-    }
-
-    return res.status(200).json(resp.body);
+    const updated = await ctFetch(`/carts/${encodeURIComponent(cartId)}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        version,
+        actions: [{ action: 'changeLineItemQuantity', lineItemId, quantity }],
+      }),
+    });
+    return res.status(200).json(updated);
   } catch (err) {
     return sendCtError(res, err);
   }

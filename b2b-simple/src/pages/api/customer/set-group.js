@@ -1,5 +1,5 @@
-import { getApiRoot } from '@/pages/utils/ct-sdk';
-import { sendFromCtSdk, sendCtError } from '../cart/_utils/ctErrors';
+import { ctFetch } from '@/lib/ct-rest';
+import { sendCtError } from '../cart/_utils/ctErrors';
 
 /**
  * Update Customer.customerGroup (source of truth). Client should call /api/cart/recalculate after this.
@@ -14,31 +14,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Missing customerId or customerGroupId' });
     }
 
-    const apiRoot = getApiRoot();
+    const current = await ctFetch(`/customers/${encodeURIComponent(customerId)}`);
+    const version = current.version;
 
-    const getResp = await apiRoot.customers().withId({ ID: customerId }).get().execute();
-    if (getResp.statusCode >= 400) return sendFromCtSdk(res, getResp);
-
-    const version = getResp.body.version;
-
-    const updateResp = await apiRoot
-      .customers()
-      .withId({ ID: customerId })
-      .post({
-        body: {
-          version,
-          actions: [
-            {
-              action: 'setCustomerGroup',
-              customerGroup: { typeId: 'customer-group', id: customerGroupId },
-            },
-          ],
-        },
-      })
-      .execute();
-
-    if (updateResp.statusCode >= 400) return sendFromCtSdk(res, updateResp);
-    return res.status(200).json(updateResp.body);
+    const updated = await ctFetch(`/customers/${encodeURIComponent(customerId)}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        version,
+        actions: [
+          { action: 'setCustomerGroup', customerGroup: { typeId: 'customer-group', id: customerGroupId } },
+        ],
+      }),
+    });
+    return res.status(200).json(updated);
   } catch (err) {
     return sendCtError(res, err);
   }

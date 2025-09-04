@@ -7,38 +7,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get access token
-    const authRes = await fetch(
-      'https://auth.eu-central-1.aws.commercetools.com/oauth/token',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization:
-            'Basic ' +
-            Buffer.from(
-              '8q8D4Dt0axzQOQeM40fwHaGh:uNppWOlnTLBkqyFEx8L7chHgtSAFu43y'
-            ).toString('base64'),
-        },
-        body: 'grant_type=client_credentials',
-      }
-    );
+    // Use central token helper and env-driven API base
+  const { getCTToken } = await import('../../../../lib/ctAuth.js');
+  const { API, buildPriceSelection } = await import('../../../../lib/ct-rest.js');
 
-    if (!authRes.ok) {
-      const error = await authRes.text();
-      return res.status(authRes.status).json({ error });
-    }
-
-    const authData = await authRes.json();
-
-    // Fetch product projection with price parameters
+    const { access_token } = await getCTToken();
+    const qs = buildPriceSelection({}).toString();
     const productRes = await fetch(
-      `https://api.eu-central-1.aws.commercetools.com/chempilot/product-projections/${id}?priceCurrency=GBP&priceCountry=GB`,
-      {
-        headers: {
-          Authorization: `Bearer ${authData.access_token}`,
-        },
-      }
+      API(`/product-projections/${encodeURIComponent(id)}?${qs}`),
+      { headers: { Authorization: `Bearer ${access_token}` } }
     );
 
     if (!productRes.ok) {
@@ -46,7 +23,7 @@ export default async function handler(req, res) {
       return res.status(productRes.status).json({ error });
     }
 
-    const productData = await productRes.json();
+  const productData = await productRes.json();
 
     // The prices should already be in the response, but let's make sure
     console.log('Product API response:', {
@@ -61,7 +38,7 @@ export default async function handler(req, res) {
       }))
     });
 
-    return res.status(200).json(productData);
+  return res.status(200).json(productData);
   } catch (err) {
     console.error('Product API error:', err);
     return res.status(500).json({ error: err.message });

@@ -4,39 +4,26 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { q: query, limit = 50 } = req.query;
+  const { q: query, limit = 50, priceCurrency = 'GBP', priceCountry = 'GB', priceCustomerGroup } = req.query;
 
   if (!query || query.trim().length < 1) {
     return res.status(400).json({ message: 'Search query is required' });
   }
 
   try {
-    // Get auth token
-    const authRes = await fetch(
-      'https://auth.eu-central-1.aws.commercetools.com/oauth/token',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(
-            '8q8D4Dt0axzQOQeM40fwHaGh:uNppWOlnTLBkqyFEx8L7chHgtSAFu43y'
-          ).toString('base64')}`,
-        },
-        body: 'grant_type=client_credentials',
-      }
-    );
+    const { getCTToken } = await import('../../../lib/ctAuth.js');
+  const { API } = await import('../../../lib/ct-rest.js');
+    const { access_token } = await getCTToken();
 
-    const auth = await authRes.json();
-    const token = auth.access_token;
+    const sp = new URLSearchParams();
+    sp.set('limit', '200');
+    if (priceCurrency) sp.set('priceCurrency', String(priceCurrency));
+    if (priceCountry) sp.set('priceCountry', String(priceCountry));
+    if (priceCustomerGroup) sp.set('priceCustomerGroup.id', String(priceCustomerGroup));
 
-    // Get all products and filter client-side (simpler approach)
     const productsRes = await fetch(
-      `https://api.eu-central-1.aws.commercetools.com/chempilot/product-projections?limit=200`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      API(`/product-projections?${sp.toString()}`),
+      { headers: { Authorization: `Bearer ${access_token}` } }
     );
 
     if (!productsRes.ok) {
@@ -54,7 +41,7 @@ export default async function handler(req, res) {
     });
 
     // Transform results
-    const products = filteredProducts.slice(0, parseInt(limit)).map((p) => ({
+  const products = filteredProducts.slice(0, parseInt(limit)).map((p) => ({
       id: p.id,
       name: p.name['en-GB'] || p.name['en'] || 'No name',
       sku: p.masterVariant?.sku || '',

@@ -1,28 +1,46 @@
 /* eslint-disable no-console */
 
-// ---- Env & constants ----
-const REGION = process.env.CT_REGION || "eu-central-1";
-const PROJECT_KEY = process.env.CT_PROJECT_KEY || "chempilot";
-const STORE_KEY = process.env.CT_STORE_KEY || "default-store";
+// ---- Required env (fail fast, no hardcoding) ----
+const PROJECT_KEY = process.env.CT_PROJECT_KEY;
+const CT_CLIENT_ID = process.env.CT_CLIENT_ID;
+const CT_CLIENT_SECRET = process.env.CT_CLIENT_SECRET;
+const CT_AUTH_URL = process.env.CT_AUTH_URL; // e.g. https://auth.eu-central-1.aws.commercetools.com
+const CT_API_URL = process.env.CT_API_URL;   // e.g. https://api.eu-central-1.aws.commercetools.com
 
-const STORE_BASE = `https://api.${REGION}.aws.commercetools.com/${PROJECT_KEY}/in-store/key=${STORE_KEY}`;
-
-// Allowed customer groups (IDs)
-const CATALOGUE_ID = process.env.CT_GROUP_ID_CATALOGUE || "5db880e5-3e15-4cc0-9cd1-2b214dd53f23";
-const CONTRACT_ID  = process.env.CT_GROUP_ID_CONTRACT  || "b2b1bafe-e36b-4d95-93c5-82ea07d7e159";
-
-const allowedGroupIds = (process.env.CT_ALLOWED_GROUP_IDS || `${CATALOGUE_ID},${CONTRACT_ID}`)
+// Optional: restrict to specific group IDs. If empty, accept any.
+const allowedGroupIds = (process.env.CT_ALLOWED_GROUP_IDS || "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
 
+function assertEnv() {
+  const missing = [];
+  if (!PROJECT_KEY) missing.push("CT_PROJECT_KEY");
+  if (!CT_CLIENT_ID) missing.push("CT_CLIENT_ID");
+  if (!CT_CLIENT_SECRET) missing.push("CT_CLIENT_SECRET");
+  if (!CT_AUTH_URL) missing.push("CT_AUTH_URL");
+  if (!CT_API_URL) missing.push("CT_API_URL");
+  if (missing.length) throw new Error(`Missing required env: ${missing.join(", ")}`);
+}
+
+function projectBase() {
+  // No store scope — project-scoped API
+  return `${CT_API_URL.replace(/\/$/, "")}/${PROJECT_KEY}`;
+}
+
 // ---- utils ----
 async function readCTError(resp) {
-  const correlationId = resp.headers.get("X-Correlation-ID") || resp.headers.get("x-correlation-id") || null;
+  const correlationId =
+    resp.headers.get("X-Correlation-ID") ||
+    resp.headers.get("x-correlation-id") ||
+    null;
+
   let rawText = "";
   try { rawText = await resp.text(); } catch {}
+
   let json = null;
   try { json = rawText ? JSON.parse(rawText) : null; } catch {}
+
   let message = `${resp.status} ${resp.statusText}`;
   if (json?.message) message += `: ${json.message}`;
   if (json?.errors?.length) {
@@ -34,45 +52,21 @@ async function readCTError(resp) {
   return { status: resp.status, correlationId, message, json, rawText };
 }
 
-async function getAppToken() {
-  const id = process.env.CT_CLIENT_ID;
-  const secret = process.env.CT_CLIENT_SECRET;
-  if (!id || !secret) throw new Error("Server missing CT_CLIENT_ID / CT_CLIENT_SECRET");
-  const tokenResp = await fetch(`https://auth.${REGION}.aws.commercetools.com/oauth/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Basic " + Buffer.from(`${id}:${secret}`).toString("base64"),
-    },
-    body: new URLSearchParams({
-      grant_type: "client_credentials",
-      scope: `manage_project:${PROJECT_KEY}`,
-    }),
-  });
-  if (!tokenResp.ok) {
-    const err = await readCTError(tokenResp);
-    throw new Error(`App token failed: ${err.message}`);
-  }
-  const j = await tokenResp.json();
-  return `${j.token_type || "Bearer"} ${j.access_token}`;
-}
-
+// ---- main handler ----
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST")
+    return res.status(405).json({ error: "Method not allowed" });
 
   const { email, password } = req.body || {};
-  if (!email || !password) return res.status(422).json({ error: "Email and password required" });
+  if (!email || !password)
+    return res.status(422).json({ error: "Email and password required" });
 
   try {
-    // --- 1) In-store PASSWORD grant (customer login) ---
-    const CLIENT_ID = process.env.CT_CLIENT_ID;
-    const CLIENT_SECRET = process.env.CT_CLIENT_SECRET;
-    if (!CLIENT_ID || !CLIENT_SECRET) {
-      return res.status(500).json({ error: "Server is missing CT_CLIENT_ID / CT_CLIENT_SECRET" });
-    }
+    assertEnv();
 
-    const authUrl = `https://auth.${REGION}.aws.commercetools.com/oauth/${PROJECT_KEY}/in-store/key=${STORE_KEY}/customers/token`;
-    const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
+    // 1) Project-scoped PASSWORD grant (no store)
+    const authUrl = `${CT_AUTH_URL.replace(/\/$/, "")}/oauth/${PROJECT_KEY}/customers/token`;
+    const basic = Buffer.from(`${CT_CLIENT_ID}:${CT_CLIENT_SECRET}`).toString("base64");
 
     const tokenResp = await fetch(authUrl, {
       method: "POST",
@@ -100,8 +94,8 @@ export default async function handler(req, res) {
     const tokenJson = await tokenResp.json();
     const customerBearer = `${tokenJson.token_type || "Bearer"} ${tokenJson.access_token}`;
 
-    // --- 2) /me profile ---
-    const meResp = await fetch(`${STORE_BASE}/me`, {
+    // 2) /me (project-scoped)
+    const meResp = await fetch(`${projectBase()}/me`, {
       headers: { Authorization: customerBearer },
     });
     if (!meResp.ok) {
@@ -114,146 +108,39 @@ export default async function handler(req, res) {
     }
     const me = await meResp.json();
 
-    // --- 2a) Approval gate ---
-    const fields = me?.custom?.fields || {};
-    const approval = String(fields.approvalStatus || "").toLowerCase();
-    const legacyApproved = fields.approved === true;
-    const isApproved = approval === "approved" || legacyApproved;
+    // 3) Derive effective group (non-blocking, no auto-assign)
+    const primaryGroupId = me?.customerGroup?.id || null;
+    const assignments = Array.isArray(me?.customerGroupAssignments)
+      ? me.customerGroupAssignments
+      : [];
+    const assignmentIds = assignments
+      .map((a) => a?.customerGroup?.id || a?.id || null)
+      .filter(Boolean);
 
-    if (!isApproved) {
-      return res.status(403).json({
-        error: "Account not approved yet",
-        approvalStatus: approval || null,
-        message: "Your account is pending approval. Please wait until an admin approves your registration.",
-      });
-    }
-
-    // --- 2b) Collect current groups ---
-    const singleGroupId = me?.customerGroup?.id || null;
-    const assignments = Array.isArray(me?.customerGroupAssignments) ? me.customerGroupAssignments : [];
-    const assignmentIds = assignments.map((a) => a?.customerGroup?.id || a?.id || null).filter(Boolean);
-    let pool = [
-      ...(singleGroupId ? [singleGroupId] : []),
+    const pool = [
+      ...(primaryGroupId ? [primaryGroupId] : []),
       ...assignmentIds,
     ];
-    let poolAllowed = pool.filter((id) => allowedGroupIds.includes(id));
 
-    // --- 2c) AUTO-ASSIGN if no valid group ---
-    if (poolAllowed.length === 0) {
-      const requested = String(fields.requestedGroup || "").toLowerCase();
-      const desiredGroupId = requested === "contract" ? CONTRACT_ID : CATALOGUE_ID;
+    const filtered =
+      allowedGroupIds.length > 0
+        ? pool.filter((id) => allowedGroupIds.includes(id))
+        : pool;
 
-      try {
-        const appBearer = await getAppToken();
+    const effectiveGroupId = filtered[0] || primaryGroupId || null;
 
-        let upd = await fetch(`${STORE_BASE}/customers/${me.id}`, {
-          method: "POST",
-          headers: { Authorization: appBearer, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            version: me.version,
-            actions: [
-              {
-                action: "addCustomerGroupAssignment",
-                customerGroupAssignment: {
-                  customerGroup: { typeId: "customer-group", id: desiredGroupId },
-                },
-              },
-            ],
-          }),
-        });
-
-        if (upd.status === 409) {
-          const freshResp = await fetch(`${STORE_BASE}/customers/${me.id}`, {
-            headers: { Authorization: appBearer },
-          });
-          if (freshResp.ok) {
-            const fresh = await freshResp.json();
-            upd = await fetch(`${STORE_BASE}/customers/${me.id}`, {
-              method: "POST",
-              headers: { Authorization: appBearer, "Content-Type": "application/json" },
-              body: JSON.stringify({
-                version: fresh.version,
-                actions: [
-                  {
-                    action: "addCustomerGroupAssignment",
-                    customerGroupAssignment: {
-                      customerGroup: { typeId: "customer-group", id: desiredGroupId },
-                    },
-                  },
-                ],
-              }),
-            });
-          }
-        }
-
-        if (!upd.ok) {
-          const err1 = await readCTError(upd);
-          console.warn("addCustomerGroupAssignment failed, falling back to setCustomerGroup", err1.message);
-
-          const fallback = await fetch(`${STORE_BASE}/customers/${me.id}`, {
-            method: "POST",
-            headers: { Authorization: appBearer, "Content-Type": "application/json" },
-            body: JSON.stringify({
-              version: me.version,
-              actions: [
-                {
-                  action: "setCustomerGroup",
-                  customerGroup: { typeId: "customer-group", id: desiredGroupId },
-                },
-              ],
-            }),
-          });
-
-          if (!fallback.ok) {
-            const err2 = await readCTError(fallback);
-            console.error("Failed to setCustomerGroup on login", err2);
-            return res.status(403).json({
-              error: "Your account is not assigned to a valid customer group yet.",
-              details: { desiredGroupId, reason: err2.message },
-            });
-          }
-        }
-
-        pool = [desiredGroupId];
-        poolAllowed = [desiredGroupId];
-      } catch (e) {
-        console.error("🔥 Auto-assign group error", e);
-        return res.status(403).json({
-          error: "Your account is not assigned to a valid customer group yet.",
-          details: { reason: e.message },
-        });
-      }
-    }
-
-    // --- 3) Pick effective group for pricing ---
-    let effectiveGroupId = null;
-    let effectiveGroupKey = null;
-
-    if (poolAllowed.includes(CONTRACT_ID)) {
-      effectiveGroupId = CONTRACT_ID;
-      effectiveGroupKey = "contract";
-    } else if (poolAllowed.includes(CATALOGUE_ID)) {
-      effectiveGroupId = CATALOGUE_ID;
-      effectiveGroupKey = "catalogue";
-    } else {
-      effectiveGroupId = poolAllowed[0];
-      effectiveGroupKey = null;
-    }
-
+    // 4) Pricing selection hint (for your resolvers)
     const priceSelection = {
       currency: "GBP",
       country: "GB",
-      customerGroupId: effectiveGroupId,
+      customerGroupId: effectiveGroupId || undefined,
     };
 
-    // --- 4) Email-domain portal routing ---
+    // Optional: domain-based redirect (safe to remove)
     const domain = (me.email || "").split("@")[1]?.toLowerCase() || "";
-    let redirect = "/"; // default
-    if (domain === "chemlab.com") {
-      redirect = "/chemlab/index";
-    }
+    let redirect = "/";
+    if (domain === "chemlab.com") redirect = "/chemlab/index";
 
-    // --- 5) Success ---
     return res.status(200).json({
       success: true,
       redirect,
@@ -264,16 +151,13 @@ export default async function handler(req, res) {
         firstName: me.firstName,
         lastName: me.lastName,
         companyName: me.companyName,
-        custom: me.custom,
+        custom: me.custom || null,
         customerGroup: me.customerGroup || null,
         customerGroupAssignments: me.customerGroupAssignments || [],
         effectiveGroupId,
-        effectiveGroupKey,
         priceSelection,
       },
-      storeKey: STORE_KEY,
     });
-
   } catch (err) {
     console.error("🔥 Login error", err);
     return res.status(500).json({ error: "Internal error", details: err?.message || String(err) });

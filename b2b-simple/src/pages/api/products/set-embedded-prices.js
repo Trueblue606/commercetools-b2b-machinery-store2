@@ -1,4 +1,4 @@
-import { getApiRoot } from "@/pages/utils/ct-sdk";
+import { ctFetch } from "@/lib/ct-rest";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -6,27 +6,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiRoot = getApiRoot();
-
     // Fetch first 100 products
-    const result = await apiRoot.products().get({ queryArgs: { limit: 100 } }).execute();
+    const result = await ctFetch(`/products?limit=100`);
 
     const updates = [];
-
-    for (const product of result.body.results) {
+    for (const product of result.results || []) {
       if (product.priceMode === "Standalone") {
         console.log(`Updating product ${product.key} (${product.id}) → Embedded`);
         updates.push(
-          apiRoot
-            .products()
-            .withId({ ID: product.id })
-            .post({
-              body: {
-                version: product.version,
-                actions: [{ action: "setPriceMode", priceMode: "Embedded" }],
-              },
-            })
-            .execute()
+          ctFetch(`/products/${encodeURIComponent(product.id)}`, {
+            method: "POST",
+            body: JSON.stringify({
+              version: product.version,
+              actions: [{ action: "setPriceMode", priceMode: "Embedded" }],
+            }),
+          })
         );
       }
     }
@@ -34,13 +28,9 @@ export default async function handler(req, res) {
     const responses = await Promise.all(updates);
 
     return res.status(200).json({
-      totalProducts: result.body.results.length,
+      totalProducts: result.results?.length || 0,
       updatedCount: responses.length,
-      updatedProducts: responses.map((r) => ({
-        id: r.body.id,
-        key: r.body.key,
-        priceMode: r.body.priceMode,
-      })),
+      updatedProducts: responses.map((body) => ({ id: body.id, key: body.key, priceMode: body.priceMode })),
     });
   } catch (err) {
     console.error("Bulk set priceMode error:", err);

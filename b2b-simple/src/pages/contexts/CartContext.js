@@ -17,17 +17,14 @@ export function CartProvider({ children }) {
   const [selectedItems, setSelectedItems] = useState(new Set());
   const selectedItemCount = selectedItems.size;
 
-  // Real customer group IDs
-  const groupMap = {
-    catalogue: "5db880e5-3e15-4cc0-9cd1-2b214dd53f23",
-    contract: "b2b1bafe-e36b-4d95-93c5-82ea07d7e159",
-    asm: "48627f63-30a3-47d8-8d3d-4b1c30787a8a",
-  };
+  // Customer group IDs are resolved server-side; avoid hardcoding here
+  const groupMap = {};
 
   // Load cart on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("cartId");
+      const stored =
+        localStorage.getItem("chemb2b:cartId") || localStorage.getItem("cartId");
       if (stored) {
         fetch(`/api/cart/get?id=${stored}`)
           .then((res) => (res.ok ? res.json() : null))
@@ -77,12 +74,13 @@ export function CartProvider({ children }) {
     setSelectedItems(new Set());
   }
 
-  // Create guest cart first
+  // Create cart with defaults (always GBP + GB)
   async function createCart(customerGroupId, customerStoreKey) {
     const body = {
       currency: "GBP",
-      customerGroupId: String(customerGroupId || groupMap.catalogue),
+      country: "GB", // ✅ ensure UK country is always set
     };
+    if (customerGroupId) body.customerGroupId = String(customerGroupId);
     if (customerStoreKey) body.customerStoreKey = customerStoreKey;
 
     const res = await fetch("/api/cart/create", {
@@ -95,7 +93,7 @@ export function CartProvider({ children }) {
     const json = await res.json();
     setCart(json);
     try {
-      localStorage.setItem("cartId", json.id);
+      localStorage.setItem("chemb2b:cartId", json.id);
     } catch {}
     return json;
   }
@@ -108,9 +106,13 @@ export function CartProvider({ children }) {
       attempt += 1;
 
       // Always fetch latest cart to get current version
-      const latestRes = await fetch(`/api/cart/get?id=${encodeURIComponent(cartId)}`);
+      const latestRes = await fetch(
+        `/api/cart/get?id=${encodeURIComponent(cartId)}`
+      );
       if (!latestRes.ok) {
-        const text = await latestRes.text().catch(() => 'Failed to fetch latest cart');
+        const text = await latestRes
+          .text()
+          .catch(() => "Failed to fetch latest cart");
         throw new Error(text);
       }
       const latestCart = await latestRes.json();
@@ -119,83 +121,80 @@ export function CartProvider({ children }) {
 
       if (res.ok) {
         const json = await res.json();
-        setCart(json); // keep your state setter
+        setCart(json);
         try {
-          localStorage.setItem('cartId', json.id);
+          localStorage.setItem("chemb2b:cartId", json.id);
         } catch {}
         return json;
       }
 
       // Inspect failure
-      const raw = await res.text().catch(() => '');
+      const raw = await res.text().catch(() => "");
       let parsed = null;
-      try { parsed = JSON.parse(raw); } catch { /* raw stays string */ }
+      try {
+        parsed = JSON.parse(raw);
+      } catch {}
 
       const status = res.status;
       const code = parsed?.errors?.[0]?.code;
 
-      const isConcurrent = status === 409 || code === 'ConcurrentModification';
+      const isConcurrent = status === 409 || code === "ConcurrentModification";
       if (isConcurrent) {
-        console.warn(`CT ConcurrentModification (attempt ${attempt}/${maxRetries}) – retrying`);
-        const delay = Math.min(1000, 150 * attempt) + Math.floor(Math.random() * 100);
-        await new Promise(r => setTimeout(r, delay));
-        continue; // next loop with newer version
+        console.warn(
+          `CT ConcurrentModification (attempt ${attempt}/${maxRetries}) – retrying`
+        );
+        const delay =
+          Math.min(1000, 150 * attempt) + Math.floor(Math.random() * 100);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
       }
 
-      // Not retryable – surface error
-      throw new Error(parsed?.message || raw || 'Cart update failed');
+      throw new Error(parsed?.message || raw || "Cart update failed");
     }
 
-    throw new Error('Cart update failed after retries (ConcurrentModification).');
+    throw new Error(
+      "Cart update failed after retries (ConcurrentModification)."
+    );
   }
 
-  // Link cart to customer
-// Link cart to customer + ensure addresses are on the cart
-async function setCartCustomer(cartId, customerId, customerGroupId) {
-  // 1) Attach the customer (and group) to the cart
-  const attachedCart = await performCartUpdate(cartId, (latestCart) =>
-    fetch("/api/cart/set-customer", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cartId: latestCart.id,
-        version: latestCart.version,
-        customerId,
-        customerGroupId,
-      }),
-    })
-  );
+  // Link cart to customer + ensure addresses are on the cart
+  async function setCartCustomer(cartId, customerId, customerGroupId) {
+    const attachedCart = await performCartUpdate(cartId, (latestCart) =>
+      fetch("/api/cart/set-customer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cartId: latestCart.id,
+          version: latestCart.version,
+          customerId,
+          customerGroupId,
+        }),
+      })
+    );
 
-  // 2) If addresses are missing, copy defaults from the customer onto the cart
-  if (!attachedCart?.shippingAddress || !attachedCart?.billingAddress) {
-    const resp = await fetch("/api/cart/set-address", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cartId: attachedCart.id, customerId }),
-    });
+    if (!attachedCart?.shippingAddress || !attachedCart?.billingAddress) {
+      const resp = await fetch("/api/cart/set-address", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartId: attachedCart.id, customerId }),
+      });
 
-    if (resp.ok) {
-      const cartWithAddresses = await resp.json();
-      // If your context holds cart state, update it here:
-      if (typeof setCart === "function") setCart(cartWithAddresses);
-      return cartWithAddresses;
-    } else {
-      // Optional: log but don’t block checkout
-      console.warn("set-address failed:", await resp.text());
+      if (resp.ok) {
+        const cartWithAddresses = await resp.json();
+        if (typeof setCart === "function") setCart(cartWithAddresses);
+        return cartWithAddresses;
+      } else {
+        console.warn("set-address failed:", await resp.text());
+      }
     }
+
+    return attachedCart;
   }
-
-  return attachedCart;
-}
-
-
 
   // Add item to cart
   async function addItem(sku, quantity = 1) {
     let currentCart = cart;
-    if (!currentCart) {
-      currentCart = await createCart(groupMap.catalogue);
-    }
+    if (!currentCart) currentCart = await createCart();
     setLoading(true);
 
     try {
@@ -220,7 +219,6 @@ async function setCartCustomer(cartId, customerId, customerGroupId) {
     return addItem(sku, quantity);
   }
 
-  // Quantity update
   async function updateQuantity(lineItemId, quantity) {
     if (!cart) return null;
     if (quantity <= 0) return removeFromCart(lineItemId);
@@ -232,15 +230,12 @@ async function setCartCustomer(cartId, customerId, customerGroupId) {
         body: JSON.stringify({
           cartId: latestCart.id,
           version: latestCart.version,
-          actions: [
-            { action: "changeLineItemQuantity", lineItemId, quantity },
-          ],
+          actions: [{ action: "changeLineItemQuantity", lineItemId, quantity }],
         }),
       })
     );
   }
 
-  // Remove item
   async function removeFromCart(lineItemId) {
     if (!cart) return null;
 
@@ -264,7 +259,6 @@ async function setCartCustomer(cartId, customerId, customerGroupId) {
     });
   }
 
-  // Set customer group
   async function setCartCustomerGroup(groupKey = "catalogue") {
     if (!cart) return null;
 
@@ -289,12 +283,11 @@ async function setCartCustomer(cartId, customerId, customerGroupId) {
     );
   }
 
-  // Clear cart
   function clearCart() {
     setCart(null);
     setSelectedItems(new Set());
     try {
-      localStorage.removeItem("cartId");
+      localStorage.removeItem("chemb2b:cartId");
     } catch {}
   }
 
