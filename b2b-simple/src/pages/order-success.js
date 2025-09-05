@@ -60,7 +60,7 @@ export default function OrderSuccess() {
 
   return (
     <>
-      <Navbar />
+     
       <div style={pageWrap}>
         <div style={card}>
           <h1 style={heading}>Order Confirmed!</h1>

@@ -172,7 +172,7 @@ export default function ProductDetail({ initialProduct, error }) {
 
   return (
     <>
-      <Navbar />
+   
       <div style={{ maxWidth: 1200, margin: '40px auto', padding: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
         <ProductImagesGallery images={mv?.images || (product.image ? [{ url: product.image }] : [])} />
 

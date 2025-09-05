@@ -52,7 +52,7 @@ export default function Cart() {
   if (loading) {
     return (
       <>
-        <Navbar />
+       
         <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
             <div style={{ display: 'inline-block', width: '50px', height: '50px', border: '4px solid #e5e7eb', borderTop: '4px solid #0d2340', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
@@ -69,7 +69,7 @@ export default function Cart() {
   if (error) {
     return (
       <>
-        <Navbar />
+       
         <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
             <h1 style={{ color: '#ef4444', marginBottom: '16px' }}>Error Loading Cart</h1>
@@ -84,7 +84,7 @@ export default function Cart() {
   if (lineItems.length === 0) {
     return (
       <>
-        <Navbar />
+      
         <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
             <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#0d2340', marginBottom: '32px' }}>Shopping Cart</h1>
@@ -109,7 +109,7 @@ export default function Cart() {
   // ===== MAIN UI =====
   return (
     <>
-      <Navbar />
+   
       <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
           

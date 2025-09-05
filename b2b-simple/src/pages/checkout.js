@@ -240,7 +240,7 @@ const handlePlaceOrder = useCallback(async () => {
   // UI
   return (
     <>
-      <Navbar />
+     
       <div
         style={{
           maxWidth: 800,

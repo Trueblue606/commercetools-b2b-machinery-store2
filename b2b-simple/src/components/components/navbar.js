@@ -1,59 +1,67 @@
-// src/components/navbar.js
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useCart } from '../contexts/CartContext';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useCart } from "@/src/pages/contexts/CartContext";
 
 export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
   const [customer, setCustomer] = useState(null);
   const { cart, itemCount, setCartCustomer } = useCart();
 
-  // 🔄 Restore customer + ensure cart is linked
   useEffect(() => {
-    const stored = localStorage.getItem('customer');
-    if (!stored) return;
+    function syncCustomer() {
+      try {
+        const stored = localStorage.getItem("customer");
+        if (stored) {
+          const customerData = JSON.parse(stored);
+          setCustomer(customerData);
 
-    try {
-      const customerData = JSON.parse(stored);
-      setCustomer(customerData);
-
-      if (cart && !cart.customerId) {
-        setCartCustomer(
-          cart.id,
-          customerData.id,
-          customerData.customerGroup?.id ||
-            customerData.effectiveGroupId ||
-            (Array.isArray(customerData.customerGroupAssignments)
-              ? customerData.customerGroupAssignments[0]?.id
-              : null)
-        );
+          // ✅ Prevent loop: only update if cart exists and has a different customerId
+          if (cart && cart.customerId !== customerData.id) {
+            setCartCustomer(
+              cart.id,
+              customerData.id,
+              customerData.customerGroup?.id ||
+                customerData.effectiveGroupId ||
+                (Array.isArray(customerData.customerGroupAssignments)
+                  ? customerData.customerGroupAssignments[0]?.id
+                  : null)
+            );
+          }
+        } else {
+          setCustomer(null);
+        }
+      } catch {
+        setCustomer(null);
       }
-    } catch (e) {
-      console.error('Failed to parse stored customer', e);
     }
+
+    // Run immediately
+    syncCustomer();
+
+    // Also watch for localStorage updates
+    window.addEventListener("storage", syncCustomer);
+    return () => window.removeEventListener("storage", syncCustomer);
   }, [cart, setCartCustomer]);
 
   const handleLogout = () => {
-    localStorage.removeItem('customer');
+    localStorage.removeItem("customer");
     setCustomer(null);
-    if (cart) {
-      setCartCustomer(cart.id, null, null); // reset link
-    }
-    window.location.href = '/';
+    // No need to call setCartCustomer(null) here, just clear state
+    window.location.href = "/";
   };
 
-  // ✅ Group ID mapping
+  // ✅ Hardcoded group IDs from your list
   const groupMap = {
-    'd7a14b96-ca48-4a3f-b35d-6bce624e3b16': { key: 'standard', label: 'Standard' },
-    'fc05910d-ec00-4d7a-abaa-967d352af9fc': { key: 'testoverlap', label: 'Test Overlap' },
-    '68baca5b-b96b-4751-9f85-215fb1a7417c': { key: 'special', label: 'Special Project' },
-    'a1aff334-3def-4937-9116-5f2f96f93214': { key: 'distributor', label: 'Distributor' },
-    '20304c81-f448-4c7e-9231-ba55488251e5': { key: 'contractA', label: 'Contract A' },
+    "d7a14b96-ca48-4a3f-b35d-6bce624e3b16": { key: "standard", label: "Standard" },
+    "fc05910d-ec00-4d7a-abaa-967d352af9fc": { key: "testoverlap", label: "Test Overlap" },
+    "68baca5b-b96b-4751-9f85-215fb1a7417c": { key: "special", label: "Special Project" },
+    "a1aff334-3def-4937-9116-5f2f96f93214": { key: "distributor", label: "Distributor" },
+    "20304c81-f448-4c7e-9231-ba55488251e5": { key: "contractA", label: "Contract A" },
   };
 
   const getCustomerGroup = () => {
     if (!customer) return null;
-
     const ids = [];
+
     if (customer.effectiveGroupId) ids.push(customer.effectiveGroupId);
     if (customer.customerGroup?.id) ids.push(customer.customerGroup.id);
     if (Array.isArray(customer.customerGroupAssignments)) {
@@ -66,7 +74,6 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
     for (const id of ids) {
       if (groupMap[id]) return groupMap[id];
     }
-
     return null;
   };
 
@@ -131,14 +138,6 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#d7e9f7';
-                e.currentTarget.style.borderColor = '#0d2340';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = '#d7e9f7';
-              }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="4" y1="8" x2="20" y2="8" />
@@ -167,7 +166,6 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
               backgroundColor: 'transparent',
               border: '1.5px solid #d7e9f7',
               cursor: 'pointer',
-              transition: 'all 0.2s',
               textDecoration: 'none',
               color: '#0d2340',
             }}
@@ -203,7 +201,6 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
 
           {customer ? (
             <>
-              {/* User Info */}
               <Link
                 href="/account"
                 style={{
@@ -214,7 +211,6 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                   padding: '8px 12px',
                   borderRadius: '8px',
                   backgroundColor: 'transparent',
-                  transition: 'background-color 0.2s',
                 }}
               >
                 <div
@@ -243,7 +239,6 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                 </div>
               </Link>
 
-              {/* Logout */}
               <button
                 onClick={handleLogout}
                 style={{
@@ -253,17 +248,15 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                   padding: '8px 16px',
                   fontWeight: 500,
                   fontSize: '14px',
-                  fontFamily: "'Outfit', sans-serif",
                   color: '#0d2340',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  transition: 'all 0.2s',
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2-2h4" />
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
                   <line x1="21" y1="12" x2="9" y2="12" />
                 </svg>

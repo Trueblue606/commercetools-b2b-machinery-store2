@@ -1,84 +1,49 @@
 // components/FiltersSidebar.js
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-export default function FiltersSidebar({ 
-  categories, 
-  onSelectCategory, 
-  onSelectProductSelection,
+export default function FiltersSidebar({
+  categories = [],
+  onSelectCategory = () => {},
   onClose,
-  authToken 
 }) {
-  const [productSelections, setProductSelections] = useState([]);
-  const [loadingSelections, setLoadingSelections] = useState(true);
-  const [activeFilter, setActiveFilter] = useState({ type: null, id: null });
+  // ✅ Fallback categories (used if prop is empty)
+  const DEFAULT_CATEGORIES = [
+    { id: '2965b6a2-c85e-4bf6-b46d-2718f09cdc4e', name: 'Catalogue' },
+    { id: '92aaadb5-ddeb-4ece-bad4-2657fead7a74', name: 'Chemicals' },
+    { id: '34b06a3e-47e8-4d28-8ba2-652acaba3f05', name: 'Equipment' },
+    { id: '8dd53d61-d8a4-49a0-9513-22ba413b0001', name: 'Protective Gear' },
+    { id: '4fa7db3e-4ba1-4b16-bfac-4792d8698796', name: 'Monitoring & Traps' },
+    { id: '82f5c125-56e7-4fca-9091-da5600371a88', name: 'Bundles & Kits' },
+  ];
 
-  useEffect(() => {
-    fetchProductSelections();
-  }, []);
+  const cats = Array.isArray(categories) && categories.length ? categories : DEFAULT_CATEGORIES;
 
-  const fetchProductSelections = async () => {
-    if (!authToken) {
-      setLoadingSelections(false);
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        'https://api.eu-central-1.aws.commercetools.com/chempilot/product-selections?limit=100',
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
-
-      if (res.ok) {
-        const data = await res.json();
-        setProductSelections(data.results.map(selection => ({
-          id: selection.id,
-          name: selection.name?.['en-GB'] || selection.name?.['en'] || selection.key || 'Unnamed',
-          productCount: selection.productCount || 0
-        })));
-      }
-    } catch (error) {
-      console.error('Error fetching product selections:', error);
-    }
-    setLoadingSelections(false);
-  };
+  const [activeCategoryId, setActiveCategoryId] = useState(null);
 
   const handleCategoryClick = (categoryId) => {
-    setActiveFilter({ type: 'category', id: categoryId });
+    setActiveCategoryId(categoryId);
     onSelectCategory(categoryId);
   };
 
-  const handleSelectionClick = (selectionId) => {
-    setActiveFilter({ type: 'selection', id: selectionId });
-    onSelectProductSelection(selectionId);
-  };
-
-  const clearAllFilters = () => {
-    setActiveFilter({ type: null, id: null });
+  const clearAll = () => {
+    setActiveCategoryId(null);
     onSelectCategory(null);
-    onSelectProductSelection(null);
   };
 
   return (
     <>
       {/* Backdrop */}
-      <div 
+      <div
         onClick={onClose}
         style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          inset: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           zIndex: 1099,
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       />
-      
+
       {/* Sidebar */}
       <aside
         style={{
@@ -91,243 +56,137 @@ export default function FiltersSidebar({
           boxShadow: '4px 0 24px rgba(0, 0, 0, 0.15)',
           zIndex: 1100,
           fontFamily: "'Outfit', sans-serif",
-          transform: 'translateX(0)',
-          transition: 'transform 0.3s ease-in-out',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
         }}
       >
-        {/* Header - Fixed */}
-        <div style={{
-          padding: '20px 32px',
-          borderBottom: '1px solid #e5e7eb',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          backgroundColor: '#ffffff',
-          flexShrink: 0,
-          position: 'relative',
-          zIndex: 2
-        }}>
-          <h2 style={{
-            margin: 0,
-            fontSize: '22px',
-            fontWeight: '700',
-            color: '#0d2340',
-            fontFamily: "'Outfit', sans-serif"
-          }}>
+        {/* Header */}
+        <div
+          style={{
+            padding: '20px 32px',
+            borderBottom: '1px solid #e5e7eb',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#ffffff',
+            flexShrink: 0,
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: '22px',
+              fontWeight: '700',
+              color: '#0d2340',
+            }}
+          >
             Filters
           </h2>
           <button
             onClick={onClose}
             style={{
               background: 'none',
-              border: 'none',
-              fontSize: '22px',
+              border: '1px solid #e5e7eb',
+              borderRadius: 8,
+              fontSize: '16px',
               cursor: 'pointer',
               color: '#6b7280',
-              padding: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '4px',
-              transition: 'all 0.2s',
-              width: '32px',
-              height: '32px'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.backgroundColor = '#f3f4f6';
-              e.currentTarget.style.color = '#0d2340';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#6b7280';
+              padding: '6px 10px',
             }}
           >
-            ✕
+            Close
           </button>
         </div>
 
-        {/* Scrollable Content */}
-        <div 
-          className="filter-sidebar-scroll"
+        {/* Active filter pill */}
+        {activeCategoryId && (
+          <div
+            style={{
+              margin: '16px 32px 0',
+              padding: '10px 14px',
+              backgroundColor: '#d7e9f7',
+              borderRadius: 8,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: 14,
+              color: '#0d2340',
+              fontWeight: 500,
+            }}
+          >
+            1 filter applied
+            <button
+              onClick={clearAll}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#0d2340',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
+        {/* Scrollable content */}
+        <div
           style={{
             flex: 1,
             overflowY: 'auto',
-            overflowX: 'hidden',
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#d7e9f7 #ffffff'
+            padding: '16px 32px 24px',
           }}
         >
-          {/* Active Filter Indicator */}
-          {activeFilter.type && (
-            <div style={{
-              margin: '20px 32px',
-              padding: '12px 16px',
-              backgroundColor: '#d7e9f7',
-              borderRadius: '8px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <span style={{
-                fontSize: '14px',
-                color: '#0d2340',
-                fontWeight: '500'
-              }}>
-                1 filter applied
-              </span>
-              <button
-                onClick={clearAllFilters}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#0d2340',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
-              >
-                Clear
-              </button>
-            </div>
-          )}
-
-          <div style={{ padding: '0 32px 32px' }}>
-            {/* Product Selections Section */}
-            {productSelections.length > 0 && (
-              <div style={{ marginBottom: '40px' }}>
-                <h3 style={{
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: '#6b7280',
-                  marginBottom: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontFamily: "'Outfit', sans-serif"
-                }}>
-                  <span style={{ fontSize: '18px' }}>⭐</span>
-                  COLLECTIONS
-                </h3>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {productSelections.map(selection => (
-                    <button
-                      key={selection.id}
-                      onClick={() => handleSelectionClick(selection.id)}
-                      style={{
-                        background: activeFilter.type === 'selection' && activeFilter.id === selection.id 
-                          ? '#d7e9f7' : '#ffffff',
-                        border: activeFilter.type === 'selection' && activeFilter.id === selection.id
-                          ? '2px solid #0d2340' : '2px solid #e5e7eb',
-                        padding: '14px 18px',
-                        color: '#0d2340',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        textAlign: 'left',
-                        width: '100%',
-                        fontWeight: '500',
-                        transition: 'all 0.2s',
-                        borderRadius: '10px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        fontFamily: "'Outfit', sans-serif"
-                      }}
-                      onMouseEnter={e => {
-                        if (activeFilter.type !== 'selection' || activeFilter.id !== selection.id) {
-                          e.currentTarget.style.borderColor = '#0d2340';
-                          e.currentTarget.style.backgroundColor = '#d7e9f7';
-                        }
-                      }}
-                      onMouseLeave={e => {
-                        if (activeFilter.type !== 'selection' || activeFilter.id !== selection.id) {
-                          e.currentTarget.style.borderColor = '#d7e9f7';
-                          e.currentTarget.style.backgroundColor = '#ffffff';
-                        }
-                      }}
-                    >
-                      <span>{selection.name}</span>
-                      {selection.productCount > 0 && (
-                        <span style={{
-                          backgroundColor: activeFilter.type === 'selection' && activeFilter.id === selection.id
-                            ? '#0d2340' : '#d7e9f7',
-                          color: activeFilter.type === 'selection' && activeFilter.id === selection.id
-                            ? '#ffffff' : '#0d2340',
-                          padding: '2px 10px',
-                          borderRadius: '16px',
-                          fontSize: '12px',
-                          fontWeight: '600'
-                        }}>
-                          {selection.productCount}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Divider */}
-            {productSelections.length > 0 && (
-              <div style={{
-                height: '1px',
-                backgroundColor: '#d7e9f7',
-                margin: '32px 0'
-              }} />
-            )}
-
-            {/* Categories Section */}
-            <div>
-              <h3 style={{
-                fontSize: '13px',
-                fontWeight: '700',
+          {/* Categories */}
+          <div>
+            <h3
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 color: '#6b7280',
-                marginBottom: '16px',
+                margin: '16px 0',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                fontFamily: "'Outfit', sans-serif"
-              }}>
-                <span style={{ fontSize: '18px' }}>📁</span>
-                CATEGORIES
-              </h3>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {categories.map(cat => (
+                gap: 8,
+              }}
+            >
+              <span style={{ fontSize: 18 }}>📁</span>
+              CATEGORIES
+            </h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {cats.map((cat) => {
+                const active = activeCategoryId === cat.id;
+                return (
                   <button
                     key={cat.id}
                     onClick={() => handleCategoryClick(cat.id)}
                     style={{
-                      background: activeFilter.type === 'category' && activeFilter.id === cat.id 
-                        ? '#d7e9f7' : '#ffffff',
-                      border: activeFilter.type === 'category' && activeFilter.id === cat.id
-                        ? '2px solid #0d2340' : '2px solid #d7e9f7',
+                      background: active ? '#d7e9f7' : '#ffffff',
+                      border: `2px solid ${active ? '#0d2340' : '#d7e9f7'}`,
                       padding: '14px 18px',
                       color: '#0d2340',
                       cursor: 'pointer',
-                      fontSize: '14px',
+                      fontSize: 14,
                       textAlign: 'left',
                       width: '100%',
-                      fontWeight: '500',
-                      transition: 'all 0.2s',
-                      borderRadius: '10px',
-                      fontFamily: "'Outfit', sans-serif"
+                      fontWeight: 500,
+                      transition: 'all 0.15s',
+                      borderRadius: 10,
                     }}
-                    onMouseEnter={e => {
-                      if (activeFilter.type !== 'category' || activeFilter.id !== cat.id) {
+                    onMouseEnter={(e) => {
+                      if (!active) {
                         e.currentTarget.style.borderColor = '#0d2340';
-                        e.currentTarget.style.backgroundColor = '#d7e9f7';
+                        e.currentTarget.style.backgroundColor = '#eef6fd';
                       }
                     }}
-                    onMouseLeave={e => {
-                      if (activeFilter.type !== 'category' || activeFilter.id !== cat.id) {
+                    onMouseLeave={(e) => {
+                      if (!active) {
                         e.currentTarget.style.borderColor = '#d7e9f7';
                         e.currentTarget.style.backgroundColor = '#ffffff';
                       }
@@ -335,43 +194,32 @@ export default function FiltersSidebar({
                   >
                     {cat.name}
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* Footer - Fixed */}
-        <div style={{
-          padding: '24px 32px',
-          backgroundColor: '#ffffff',
-          borderTop: '1px solid #e5e7eb',
-          flexShrink: 0
-        }}>
+        {/* Footer */}
+        <div
+          style={{
+            padding: '20px 32px',
+            borderTop: '1px solid #e5e7eb',
+            backgroundColor: '#ffffff',
+          }}
+        >
           <button
             onClick={onClose}
             style={{
               width: '100%',
-              padding: '16px',
+              padding: 14,
               backgroundColor: '#0d2340',
               color: '#ffffff',
               border: 'none',
-              borderRadius: '12px',
-              fontSize: '18px',
-              fontWeight: '600',
+              borderRadius: 12,
+              fontSize: 16,
+              fontWeight: 600,
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontFamily: "'Outfit', sans-serif"
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.backgroundColor = '#0a1c33';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(13, 35, 64, 0.3)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.backgroundColor = '#0d2340';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
             }}
           >
             Apply Filters

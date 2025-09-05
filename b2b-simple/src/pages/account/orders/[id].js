@@ -37,7 +37,7 @@ export default function OrderDetailsPage() {
   if (loading) {
     return (
       <>
-        <Navbar />
+
         <div style={wrap}>Loading order…</div>
       </>
     );
@@ -46,7 +46,7 @@ export default function OrderDetailsPage() {
   if (err || !order) {
     return (
       <>
-        <Navbar />
+   
         <div style={wrap}>
           <div>
             <h1 style={{ color: DARK_BLUE, marginBottom: 8 }}>Error Loading Order</h1>
@@ -67,7 +67,7 @@ export default function OrderDetailsPage() {
 
   return (
     <>
-      <Navbar />
+  
       <div style={page}>
         <div style={{ maxWidth: 1200, width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
           {/* LEFT: simple image gallery */}

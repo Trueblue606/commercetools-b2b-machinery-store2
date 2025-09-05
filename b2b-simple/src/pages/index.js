@@ -1,8 +1,8 @@
 // pages/index.js
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from '@/components/navbar';
-import FiltersSidebar from '@/components/FiltersSidebar';
+import Navbar from '../components/components/navbar.js';
+import FiltersSidebar from '../components/components/FiltersSidebar.js';
 import SearchBar from '@/components/SearchBar';
 
 const PRICE_CURRENCY = process.env.NEXT_PUBLIC_CT_PRICE_CURRENCY || 'GBP';
@@ -252,6 +252,41 @@ export default function Home({ initialProducts, initialCategories, authToken }) 
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 24px' }}>
           {/* search bar + active filter UI untouched */}
           {/* ... keep all your filter UI here ... */}
+
+          {(activeFilter.type || searchQuery) && (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: '#d7e9f7',
+      borderRadius: 8,
+      padding: '10px 16px',
+      marginBottom: '20px',
+    }}
+  >
+    <span style={{ fontSize: 14, color: '#0d2340', fontWeight: 500 }}>
+      {activeFilter.type === 'category' && `Category: ${activeFilter.name}`}
+      {activeFilter.type === 'selection' && `Selection: ${activeFilter.name}`}
+      {activeFilter.type === 'search' && `Search: ${activeFilter.name}`}
+    </span>
+
+    <button
+      onClick={clearAllFilters}
+      style={{
+        background: 'none',
+        border: 'none',
+        color: '#0d2340',
+        fontSize: 14,
+        fontWeight: 600,
+        cursor: 'pointer',
+        textDecoration: 'underline',
+      }}
+    >
+      Clear Filters
+    </button>
+  </div>
+)}
 
           {(isLoadingProducts || isSearching) ? (
             // your spinner styling unchanged

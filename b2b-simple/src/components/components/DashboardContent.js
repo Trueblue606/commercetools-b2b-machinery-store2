@@ -1,8 +1,8 @@
 // components/DashboardContent.jsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { COLORS } from '../account';
-import { useCart } from '../contexts/CartContext';
+import { COLORS } from '@/src/pages/account';
+import { useCart } from '@/src/pages/contexts/CartContext';
 
 // ---- shared group map (same as Navbar/PLP/PDP) ----
 const groupMap = {
