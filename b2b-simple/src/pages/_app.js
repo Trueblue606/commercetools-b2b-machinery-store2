@@ -1,7 +1,8 @@
+import Navbar from '@/components/navbar';           // ✅ keep this
 // pages/_app.js
 import '../styles/globals.css';
 import { useEffect } from 'react';
-import { CartProvider } from './contexts/CartContext'; // path is correct because _app.js is in /pages
+import { CartProvider } from './contexts/CartContext'; // keep your provider
 
 export default function App({ Component, pageProps }) {
   // Purge stale storage if project key changed; namespace keys with chemb2b:
@@ -26,6 +27,8 @@ export default function App({ Component, pageProps }) {
 
   return (
     <CartProvider>
+      {/* 👉 render the header on every page */}
+      <Navbar />
       <Component {...pageProps} />
     </CartProvider>
   );
