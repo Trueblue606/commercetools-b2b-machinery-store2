@@ -1,6 +1,6 @@
-import { getCTToken } from '../../../lib/ctAuth';
+import { getCTToken } from "@/lib/ctAuth";
 
-const PROJECT_KEY = 'chempilot';
+const PROJECT_KEY = process.env.CT_PROJECT_KEY;
 const REGION = process.env.CT_REGION || 'eu-central-1';
 const API_BASE = `https://api.${REGION}.aws.commercetools.com/${PROJECT_KEY}`;
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const createCartResponse = await fetch(`${API_BASE}/carts`, {
       method: 'POST',
       headers: {
-        Authorization: AUTH_TOKEN,
+        Authorization: 'Bearer ' + AUTH_TOKEN,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(cartPayload)

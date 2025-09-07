@@ -9,8 +9,8 @@ export default async function handler(req, res) {
     const id = req.query.id || req.query.cartId;
     if (!id) return res.status(400).json({ error: "Cart ID required" });
 
-    const { getCTToken } = await import('../../../../lib/ctAuth.js');
-    const { API } = await import('../../../../lib/ct-rest.js');
+    const { getCTToken } = await import("@/lib/ctAuth");
+    const { API } = await import("@/lib/ct-rest");
     const { access_token } = await getCTToken();
 
     const resp = await fetch(API(`/carts/${encodeURIComponent(id)}`), {
