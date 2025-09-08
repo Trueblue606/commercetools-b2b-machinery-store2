@@ -5,16 +5,15 @@ applications:
       phases:
         preBuild:
           commands:
-            - nvm install 20 >/dev/null || true
-            - nvm use 20
             - npm ci
         build:
           commands:
             - npm run build
-      artifacts:
-        baseDirectory: .next
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - node_modules/**/*
+    artifacts:
+      baseDirectory: .next
+      files:
+        - '**/*'
+    cache:
+      paths:
+        - node_modules/**/*
+        - .next/cache/**/*
