@@ -1,2 +1,2 @@
-export * from './ct-rest.js';
-export { default } from './ct-rest.js';
+export * from '../src/lib/ct-rest';
+export { default } from '../src/lib/ct-rest';
