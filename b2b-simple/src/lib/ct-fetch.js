@@ -6,7 +6,7 @@
  * - Accepts object body; stringifies automatically
  * - Throws with { status, body } on non-2xx
  */
-import { getCTToken } from "../../_lib_legacy/ctAuth.js";
+import { getCTToken } from "@/lib/ctAuth";
 
 export async function ctFetch(path, init = {}) {
   const API_URL = (process.env.CT_API_URL || "").replace(/\/+$/g, "");
