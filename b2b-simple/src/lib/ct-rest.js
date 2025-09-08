@@ -48,6 +48,6 @@ export const ctFetch = request;
 export const ctGet   = get;
 export const ctPost  = post;
 
-/** Default export for wrappers that `import impl from '../src/lib/ct-rest'` */
+/** Default export for places that import the module as a whole */
 const impl = { API, request, get, post, getProduct, getProductByKey, ctFetch, ctGet, ctPost };
 export default impl;
