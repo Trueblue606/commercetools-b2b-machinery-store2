@@ -142,7 +142,7 @@ const SearchBar = ({ onSearch, onClear, isSearching, searchResults, authToken })
             fontSize: '16px',
             fontFamily: "'Outfit', sans-serif",
             backgroundColor: 'transparent',
-            color: '#0d2340',
+            color: '#0a0a0a',
             padding: '14px 0'
           }}
         />
@@ -180,7 +180,7 @@ const SearchBar = ({ onSearch, onClear, isSearching, searchResults, authToken })
             }}
             onMouseEnter={e => {
               e.currentTarget.style.backgroundColor = '#f3f4f6';
-              e.currentTarget.style.color = '#0d2340';
+              e.currentTarget.style.color = '#0a0a0a';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.backgroundColor = 'transparent';
@@ -199,7 +199,7 @@ const SearchBar = ({ onSearch, onClear, isSearching, searchResults, authToken })
           onClick={() => handleSearch()}
           disabled={!query.trim() || isSearching}
           style={{
-            background: query.trim() ? '#0d2340' : '#e5e7eb',
+            background: query.trim() ? '#0a0a0a' : '#e5e7eb',
             color: query.trim() ? '#ffffff' : '#9ca3af',
             border: 'none',
             borderRadius: '8px',
@@ -220,7 +220,7 @@ const SearchBar = ({ onSearch, onClear, isSearching, searchResults, authToken })
           }}
           onMouseLeave={e => {
             if (query.trim() && !isSearching) {
-              e.currentTarget.style.backgroundColor = '#0d2340';
+              e.currentTarget.style.backgroundColor = '#0a0a0a';
               e.currentTarget.style.transform = 'translateY(0)';
             }
           }}
@@ -288,7 +288,7 @@ const SearchBar = ({ onSearch, onClear, isSearching, searchResults, authToken })
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.35-4.35"></path>
                   </svg>
-                  <span style={{ color: '#0d2340', fontSize: '14px' }}>{suggestion}</span>
+                  <span style={{ color: '#0a0a0a', fontSize: '14px' }}>{suggestion}</span>
                 </div>
               ))}
             </>

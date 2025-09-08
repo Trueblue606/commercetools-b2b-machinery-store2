@@ -1,5 +1,5 @@
 // pages/api/cart/set-customer.js
- import { ctFetch } from '../../../lib/ct-rest';
+ import { ctFetch } from "@/lib/ct-rest";
 import { sendCtError } from './_utils/ctErrors';
 
 /**

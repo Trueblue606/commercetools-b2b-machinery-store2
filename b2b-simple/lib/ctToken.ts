@@ -1,37 +1,30 @@
-// lib/ctToken.ts - App token via Client Credentials with in-memory cache
-import { authUrl, scope } from './ctConfig';
-
-let cache: { token: string | null; exp: number } = { token: null, exp: 0 };
-
-export async function getAppToken(): Promise<{ access_token: string; expires_in: number; token_type: string }>{
-  if (cache.token && Date.now() < cache.exp - 60_000) {
-    return {
-      access_token: cache.token,
-      token_type: 'Bearer',
-      expires_in: Math.floor((cache.exp - Date.now()) / 1000),
-    };
+export async function getAppToken() {
+  const authUrl = (process.env.CT_AUTH_URL || "").replace(/\/+$/, "");
+  const clientId = process.env.CT_CLIENT_ID || "";
+  const clientSecret = process.env.CT_CLIENT_SECRET || "";
+  const scope = process.env.CT_SCOPE || "";
+  if (!authUrl || !clientId || !clientSecret || !scope) {
+    throw new Error("Missing CT auth env (CT_AUTH_URL/CT_CLIENT_ID/CT_CLIENT_SECRET/CT_SCOPE)");
   }
 
-  const clientId = process.env.CT_CLIENT_ID || '';
-  const clientSecret = process.env.CT_CLIENT_SECRET || '';
-  if (!clientId || !clientSecret) throw new Error('CT client credentials missing');
-
-  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
   const res = await fetch(`${authUrl}/oauth/token`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      Authorization: `Basic ${basic}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: "Basic " + Buffer.from(`${clientId}:${clientSecret}`).toString("base64"),
     },
-    body: new URLSearchParams({ grant_type: 'client_credentials', scope }),
-    cache: 'no-store',
+    body: new URLSearchParams({
+      grant_type: "client_credentials",
+      scope,
+    }),
   });
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok || !json.access_token) {
-    throw new Error(`getAppToken failed: ${res.status} ${JSON.stringify(json)}`);
+
+  if (!res.ok) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`Auth failed ${res.status}: ${t}`);
   }
-  const expSec = json.expires_in || 600;
-  cache.token = json.access_token;
-  cache.exp = Date.now() + expSec * 1000;
-  return { access_token: json.access_token, token_type: json.token_type || 'Bearer', expires_in: expSec };
+  return res.json();
 }
+
+// make this file a module even if TS tree-shakes
+export {};

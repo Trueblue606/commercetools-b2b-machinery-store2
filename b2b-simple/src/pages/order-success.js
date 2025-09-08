@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
 
-const DARK_BLUE = "#0d2340";
+const DARK_BLUE = "#0a0a0a";
 const BABY_BLUE = "#d7e9f7";
 
 export default function OrderSuccess() {

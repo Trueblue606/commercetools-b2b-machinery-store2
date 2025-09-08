@@ -77,7 +77,7 @@ export default function FiltersSidebar({
               margin: 0,
               fontSize: '22px',
               fontWeight: '700',
-              color: '#0d2340',
+              color: '#0a0a0a',
             }}
           >
             Filters
@@ -110,7 +110,7 @@ export default function FiltersSidebar({
               justifyContent: 'space-between',
               alignItems: 'center',
               fontSize: 14,
-              color: '#0d2340',
+              color: '#0a0a0a',
               fontWeight: 500,
             }}
           >
@@ -120,7 +120,7 @@ export default function FiltersSidebar({
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#0d2340',
+                color: '#0a0a0a',
                 fontSize: 14,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -168,9 +168,9 @@ export default function FiltersSidebar({
                     onClick={() => handleCategoryClick(cat.id)}
                     style={{
                       background: active ? '#d7e9f7' : '#ffffff',
-                      border: `2px solid ${active ? '#0d2340' : '#d7e9f7'}`,
+                      border: `2px solid ${active ? '#0a0a0a' : '#d7e9f7'}`,
                       padding: '14px 18px',
-                      color: '#0d2340',
+                      color: '#0a0a0a',
                       cursor: 'pointer',
                       fontSize: 14,
                       textAlign: 'left',
@@ -181,7 +181,7 @@ export default function FiltersSidebar({
                     }}
                     onMouseEnter={(e) => {
                       if (!active) {
-                        e.currentTarget.style.borderColor = '#0d2340';
+                        e.currentTarget.style.borderColor = '#0a0a0a';
                         e.currentTarget.style.backgroundColor = '#eef6fd';
                       }
                     }}
@@ -213,7 +213,7 @@ export default function FiltersSidebar({
             style={{
               width: '100%',
               padding: 14,
-              backgroundColor: '#0d2340',
+              backgroundColor: '#0a0a0a',
               color: '#ffffff',
               border: 'none',
               borderRadius: 12,

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 // pages/api/orders/list.js
-import { getCTToken } from "../../../../lib/ctAuth";
+import { getCTToken } from "@/lib/ctAuth";
 
 const REGION      = process.env.CT_REGION || "eu-central-1";
 const PROJECT_KEY = process.env.CT_PROJECT_KEY;

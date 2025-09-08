@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Navbar from "@/components/navbar";
 
-const DARK_BLUE = "#0d2340";
+const DARK_BLUE = "#0a0a0a";
 
 export default function OrderDetailsPage() {
   const router = useRouter();
@@ -18,7 +18,6 @@ export default function OrderDetailsPage() {
       try {
         setLoading(true);
         setErr("");
-        // If you store a customer token, you could pass it as Authorization here – not required though:
         const r = await fetch(`/api/orders/get?id=${encodeURIComponent(id)}`);
         if (!r.ok) {
           const j = await r.json().catch(() => ({}));
@@ -37,7 +36,6 @@ export default function OrderDetailsPage() {
   if (loading) {
     return (
       <>
-
         <div style={wrap}>Loading order…</div>
       </>
     );
@@ -46,7 +44,6 @@ export default function OrderDetailsPage() {
   if (err || !order) {
     return (
       <>
-   
         <div style={wrap}>
           <div>
             <h1 style={{ color: DARK_BLUE, marginBottom: 8 }}>Error Loading Order</h1>
@@ -67,9 +64,18 @@ export default function OrderDetailsPage() {
 
   return (
     <>
-  
       <div style={page}>
-        <div style={{ maxWidth: 1200, width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
+        <div
+          style={{
+            maxWidth: 1200,
+            width: "100%",
+            margin: "0 auto",            // <-- centers the content within the page
+            padding: "0 24px",           // <-- comfy gutters on narrow screens
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 48
+          }}
+        >
           {/* LEFT: simple image gallery */}
           <div>
             <Gallery items={items} />
@@ -156,7 +162,7 @@ function Gallery({ items }) {
           {images.map((im, i) => (
             <div key={i} onClick={() => setIdx(i)} style={{
               width: 72, height: 72, borderRadius: 6,
-              border: i === idx ? "2px solid #0d2340" : "2px solid #e5e7eb",
+              border: i === idx ? "2px solid #0a0a0a" : "2px solid #e5e7eb",
               display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer"
             }}>
               {im.url ? <img src={im.url} alt={im.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ color: "#9ca3af" }}>📦</div>}
@@ -197,7 +203,7 @@ const page = { background: "#fff", minHeight: "calc(100vh - 68px)", padding: 32,
 const wrap = { display: "flex", alignItems: "center", justifyContent: "center", minHeight: "calc(100vh - 68px)", fontFamily: "'Outfit', sans-serif" };
 const panel = { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 8, padding: 16 };
 const row = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #e5e7eb" };
-const btnPrimary = { padding: "12px 20px", background: "#0d2340", color: "#fff", border: "none", borderRadius: 6, fontWeight: 700, cursor: "pointer" };
-const btnSecondary = { padding: "12px 20px", background: "#fff", color: "#0d2340", border: "2px solid #d7e9f7", borderRadius: 6, fontWeight: 700, cursor: "pointer" };
+const btnPrimary = { padding: "12px 20px", background: "#0a0a0a", color: "#fff", border: "none", borderRadius: 6, fontWeight: 700, cursor: "pointer" };
+const btnSecondary = { padding: "12px 20px", background: "#fff", color: "#0a0a0a", border: "2px solid #d7e9f7", borderRadius: 6, fontWeight: 700, cursor: "pointer" };
 const mainImgWrap = { position: "relative", background: "#f5f5f5", borderRadius: 8, height: 500, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" };
 const placeholder = { fontSize: 64, color: "#9ca3af", display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" };

@@ -147,7 +147,7 @@ export default function OrdersContent() {
                     alignItems: "center",
                     gap: 8,
                     background: status.color,
-                    color: "#0d2340",
+                    color: "#0a0a0a",
                     padding: "4px 10px",
                     borderRadius: 999,
                     fontSize: 12,

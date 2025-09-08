@@ -1,5 +1,5 @@
-import { getCTToken } from "../../../../lib/ctAuth.js";
-import { ctGet, ctPost } from "../../../../lib/ct-rest.js";
+import { getCTToken } from "@/lib/ctAuth";
+import { ctGet, ctPost } from "@/lib/ct-rest";
 
 /**
  * POST /api/order/create

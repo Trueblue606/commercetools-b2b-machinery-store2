@@ -42,13 +42,13 @@ export default async function handler(req, res) {
     const orderItemsHTML = orderData.lineItems?.map(item => `
       <tr style="border-bottom: 1px solid #e5e7eb;">
         <td style="padding: 12px 0; vertical-align: top;">
-          <strong style="color: #0d2340;">${item.name?.['en-GB'] || item.name?.['en'] || item.name}</strong><br>
+          <strong style="color: #0a0a0a;">${item.name?.['en-GB'] || item.name?.['en'] || item.name}</strong><br>
           <span style="color: #6b7280; font-size: 14px;">SKU: ${item.variant?.sku || 'N/A'}</span>
         </td>
         <td style="padding: 12px 0; text-align: center; color: #6b7280;">
           ${item.quantity}
         </td>
-        <td style="padding: 12px 0; text-align: right; color: #0d2340; font-weight: 600;">
+        <td style="padding: 12px 0; text-align: right; color: #0a0a0a; font-weight: 600;">
           ${currency} ${((item.totalPrice?.centAmount || 0) / 100).toFixed(2)}
         </td>
       </tr>
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
         
         <!-- Header -->
-        <div style="background-color: #0d2340; padding: 32px 24px; text-align: center;">
+        <div style="background-color: #0a0a0a; padding: 32px 24px; text-align: center;">
           <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;">
             Order Confirmation
           </h1>
@@ -82,11 +82,11 @@ export default async function handler(req, res) {
           <!-- Success Message -->
           <div style="text-align: center; margin-bottom: 32px;">
             <div style="width: 60px; height: 60px; background-color: #d7e9f7; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0d2340" stroke-width="3">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="3">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
             </div>
-            <h2 style="color: #0d2340; margin: 0 0 8px 0; font-size: 28px; font-weight: 700;">
+            <h2 style="color: #0a0a0a; margin: 0 0 8px 0; font-size: 28px; font-weight: 700;">
               Thank you for your order!
             </h2>
             <p style="color: #6b7280; margin: 0; font-size: 16px;">
@@ -96,20 +96,20 @@ export default async function handler(req, res) {
 
           <!-- Order Details -->
           <div style="background-color: #f8fafe; border-radius: 8px; padding: 24px; margin-bottom: 24px;">
-            <h3 style="color: #0d2340; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+            <h3 style="color: #0a0a0a; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
               Order Details
             </h3>
             
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 8px 0; color: #6b7280; font-weight: 500;">Order Number:</td>
-                <td style="padding: 8px 0; color: #0d2340; font-weight: 700; text-align: right;">
+                <td style="padding: 8px 0; color: #0a0a0a; font-weight: 700; text-align: right;">
                   ${orderData.orderNumber || 'N/A'}
                 </td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #6b7280; font-weight: 500;">Order Date:</td>
-                <td style="padding: 8px 0; color: #0d2340; font-weight: 600; text-align: right;">
+                <td style="padding: 8px 0; color: #0a0a0a; font-weight: 600; text-align: right;">
                   ${new Date(orderData.createdAt || Date.now()).toLocaleDateString('en-GB', {
                     year: 'numeric',
                     month: 'long',
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #6b7280; font-weight: 500;">Customer Email:</td>
-                <td style="padding: 8px 0; color: #0d2340; font-weight: 600; text-align: right;">
+                <td style="padding: 8px 0; color: #0a0a0a; font-weight: 600; text-align: right;">
                   ${orderData.customerEmail || 'N/A'}
                 </td>
               </tr>
@@ -129,7 +129,7 @@ export default async function handler(req, res) {
           <!-- Order Items -->
           ${orderItemsHTML ? `
           <div style="margin-bottom: 24px;">
-            <h3 style="color: #0d2340; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+            <h3 style="color: #0a0a0a; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
               Order Items
             </h3>
             <table style="width: 100%; border-collapse: collapse;">
@@ -149,7 +149,7 @@ export default async function handler(req, res) {
 
           <!-- Price Summary -->
           <div style="background-color: #f8fafe; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
-            <h3 style="color: #0d2340; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
+            <h3 style="color: #0a0a0a; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">
               Order Summary
             </h3>
             
@@ -157,26 +157,26 @@ export default async function handler(req, res) {
               ${orderData.taxedPrice ? `
               <tr>
                 <td style="padding: 6px 0; color: #6b7280;">Subtotal (net):</td>
-                <td style="padding: 6px 0; text-align: right; color: #0d2340; font-weight: 600;">
+                <td style="padding: 6px 0; text-align: right; color: #0a0a0a; font-weight: 600;">
                   ${currency} ${(netTotal / 100).toFixed(2)}
                 </td>
               </tr>
               <tr>
                 <td style="padding: 6px 0; color: #6b7280;">VAT (${(vatRate * 100).toFixed(0)}%):</td>
-                <td style="padding: 6px 0; text-align: right; color: #0d2340; font-weight: 600;">
+                <td style="padding: 6px 0; text-align: right; color: #0a0a0a; font-weight: 600;">
                   ${currency} ${(vatAmount / 100).toFixed(2)}
                 </td>
               </tr>
               <tr style="border-top: 1px solid #d7e9f7;">
-                <td style="padding: 12px 0 0 0; color: #0d2340; font-weight: 700; font-size: 18px;">Total:</td>
-                <td style="padding: 12px 0 0 0; text-align: right; color: #0d2340; font-weight: 700; font-size: 18px;">
+                <td style="padding: 12px 0 0 0; color: #0a0a0a; font-weight: 700; font-size: 18px;">Total:</td>
+                <td style="padding: 12px 0 0 0; text-align: right; color: #0a0a0a; font-weight: 700; font-size: 18px;">
                   ${currency} ${(grossTotal / 100).toFixed(2)}
                 </td>
               </tr>
               ` : `
               <tr>
-                <td style="padding: 12px 0; color: #0d2340; font-weight: 700; font-size: 18px;">Total:</td>
-                <td style="padding: 12px 0; text-align: right; color: #0d2340; font-weight: 700; font-size: 18px;">
+                <td style="padding: 12px 0; color: #0a0a0a; font-weight: 700; font-size: 18px;">Total:</td>
+                <td style="padding: 12px 0; text-align: right; color: #0a0a0a; font-weight: 700; font-size: 18px;">
                   ${currency} ${(grossTotal / 100).toFixed(2)}
                 </td>
               </tr>
@@ -186,7 +186,7 @@ export default async function handler(req, res) {
 
           <!-- Next Steps -->
           <div style="background-color: #f9fafb; border-left: 4px solid #d7e9f7; padding: 20px; margin-bottom: 24px;">
-            <h3 style="color: #0d2340; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">
+            <h3 style="color: #0a0a0a; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">
               What happens next?
             </h3>
             <ul style="color: #6b7280; margin: 0; padding-left: 20px; line-height: 1.6;">
@@ -202,7 +202,7 @@ export default async function handler(req, res) {
             <p style="color: #6b7280; margin: 0 0 16px 0; font-size: 14px;">
               Questions about your order? Contact our support team.
             </p>
-            <a href="mailto:support@yourcompany.com" style="color: #0d2340; text-decoration: none; font-weight: 600;">
+            <a href="mailto:support@yourcompany.com" style="color: #0a0a0a; text-decoration: none; font-weight: 600;">
               support@yourcompany.com
             </a>
           </div>
