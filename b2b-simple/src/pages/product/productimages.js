@@ -68,7 +68,7 @@ export default function ProductImagesGallery({ images, selectedVariant }) {
                 transform: 'translateY(-50%)',
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 border: 'none',
-                color: '#374151',
+                color: '#0a0a0a',
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
@@ -92,7 +92,7 @@ export default function ProductImagesGallery({ images, selectedVariant }) {
                 transform: 'translateY(-50%)',
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 border: 'none',
-                color: '#374151',
+                color: '#0a0a0a',
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
@@ -131,7 +131,7 @@ export default function ProductImagesGallery({ images, selectedVariant }) {
                 objectFit: 'cover',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                border: i === mainIndex ? '2px solid #0d2340' : '2px solid #e5e7eb',
+                border: i === mainIndex ? '2px solid #0a0a0a' : '2px solid #e5e7eb',
                 opacity: i === mainIndex ? 1 : 0.7,
                 transition: 'all 0.2s'
               }}
