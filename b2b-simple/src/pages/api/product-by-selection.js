@@ -9,8 +9,8 @@ export default async function handler(req, res) {
   }
 
   try {
-  const { getCTToken } = await import('../../../lib/ctAuth.js');
-  const { API } = await import('../../../lib/ct-rest.js');
+  const { getCTToken } = await import("@/lib/ctAuth");
+  const { API } = await import("@/lib/ct-rest");
     const { access_token } = await getCTToken();
 
     // 2) Fetch customer group ID (if customerEmail is provided)
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
   const searchUrl = new URL(API(`/product-projections/search`));
     searchUrl.searchParams.set("filter", `id:(${whereClause})`);
     if (customerGroupId) {
-      searchUrl.searchParams.set("priceCustomerGroup.id", customerGroupId);
+      searchUrl.searchParams.set("priceCustomerGroup", customerGroupId);
     }
     searchUrl.searchParams.set("limit", "100");
 

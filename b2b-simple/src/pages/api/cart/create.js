@@ -1,6 +1,6 @@
 // src/pages/api/cart/create.js
-import { getCTToken } from "../../../../lib/ctAuth.js";
-import { ctPost } from "../../../../lib/ct-rest.js";
+import { getCTToken } from "@/lib/ctAuth";
+import { ctPost } from "@/lib/ct-rest";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

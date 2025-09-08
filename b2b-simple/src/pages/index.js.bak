@@ -632,23 +632,20 @@ export default function Home({ initialProducts, initialCategories, authToken }) 
 
 // ----- SSR: initial load ----------------
 
-
-
 export async function getServerSideProps(context) {
-  if (context?.res?.setHeader) { context.res.setHeader("x-gssp","1"); }
   try {
     const { ctGet } = await import('@/lib/ct-rest');
 
     // Categories
     const cats = await ctGet('/categories?limit=100');
 
-    // Price selection (optional customer group from cookie)
+    // Price selection (from cookie if present)
     const groupId = context.req.cookies?.customerGroupId || '';
 
     const sp = new URLSearchParams();
     sp.set('limit', '10');
     sp.set('staged', 'true');
-    sp.set('sort', 'lastModifiedAt desc'); // ✅ valid CT sort field
+    sp.set('sort', 'lastModifiedAt desc'); // ✅ valid sort field
     sp.set('priceCurrency', 'GBP');
     sp.set('priceCountry', 'GB');
     if (groupId) sp.set('priceCustomerGroup', groupId);
@@ -669,7 +666,7 @@ export async function getServerSideProps(context) {
           image: (p.masterVariant && p.masterVariant.images && p.masterVariant.images[0] && p.masterVariant.images[0].url) || null,
           prices: (p.masterVariant && p.masterVariant.prices) || [],
         })),
-        // Never return undefined from GSSP
+        // Never return undefined; SSR will serialize this safely
         authToken: null,
       },
     };
@@ -678,3 +675,4 @@ export async function getServerSideProps(context) {
     return { props: { initialCategories: [], initialProducts: [], authToken: null } };
   }
 }
+

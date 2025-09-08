@@ -6,8 +6,8 @@ export default async function handler(req, res) {
     const { id } = req.query;
     if (!id) return res.status(400).json({ error: 'Missing customerGroup id' });
 
-    const getCTToken = (await import('../../../lib/ctAuth.js')).default;
-    const { API } = await import('../../../lib/ct-rest.js');
+    const getCTToken = (await import("@/lib/ctAuth")).default;
+    const { API } = await import("@/lib/ct-rest");
 
     const { access_token } = await getCTToken();
 

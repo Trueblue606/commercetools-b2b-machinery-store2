@@ -1,5 +1,5 @@
-import { getCTToken } from "../../../../lib/ctAuth.js";
-import { API } from "../../../../lib/ct-rest.js";
+import { getCTToken } from "@/lib/ctAuth";
+import { API } from "@/lib/ct-rest";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });

@@ -14,8 +14,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const { getCTToken } = await import('../../../../lib/ctAuth.js');
-    const { API } = await import('../../../../lib/ct-rest.js');
+    const { getCTToken } = await import("@/lib/ctAuth");
+    const { API } = await import("@/lib/ct-rest");
     const { access_token } = await getCTToken();
 
     // 1. Fetch latest cart version

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 // pages/api/orders/get.js
 // pages/api/orders/get.js
-import { getCTToken } from "../../../../lib/ctAuth";
+import { getCTToken } from "@/lib/ctAuth";
 
 
 

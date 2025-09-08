@@ -8,6 +8,8 @@
     "@commercetools/sdk-middleware-auth": "^8.0.1",
     "@commercetools/sdk-middleware-http": "^8.0.1",
     "dotenv": "^17.2.1",
+    "gsap": "^3.13.0",
+    "lucide-react": "^0.542.0",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.5",
     "react-icons": "^5.5.0",

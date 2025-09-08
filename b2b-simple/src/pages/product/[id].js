@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '@/components/navbar';
 import { useCart } from '../contexts/CartContext';
-import { getCTToken } from '../../../lib/ctAuth.js';
-import { API } from '../../../lib/ct-rest.js';
+import { getCTToken } from '@/lib/ctAuth';
+import { API } from '@/lib/ct-rest';
 
 const COLORS = { DARK_BLUE: '#0d2340', BABY_BLUE: '#d7e9f7' };
 const PRICE_CURRENCY = process.env.NEXT_PUBLIC_CT_PRICE_CURRENCY || 'GBP';

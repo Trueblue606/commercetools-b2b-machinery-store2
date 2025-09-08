@@ -3,8 +3,8 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const getCTToken = (await import('../../../lib/ctAuth.js')).default;
-    const { API } = await import('../../../lib/ct-rest.js');
+    const getCTToken = (await import("@/lib/ctAuth")).default;
+    const { API } = await import("@/lib/ct-rest");
 
     const { access_token } = await getCTToken();
 
