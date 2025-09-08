@@ -37,8 +37,17 @@ export async function request(path, { method = "GET", headers = {}, body, search
   return ct.includes("application/json") ? res.json() : res.text();
 }
 
-/** Convenience helpers expected by existing code */
+/** Modern helpers */
 export const get  = (path, opts = {})              => request(path, { ...opts, method: "GET"  });
 export const post = (path, body, opts = {})        => request(path, { ...opts, method: "POST", body });
-export const getProduct       = (id,   opts = {})  => get(`/products/${id}`, opts);
-export const getProductByKey  = (key,  opts = {})  => get(`/products/key=${encodeURIComponent(key)}`, opts);
+export const getProduct      = (id,  opts = {})    => get(`/products/${id}`, opts);
+export const getProductByKey = (key, opts = {})    => get(`/products/key=${encodeURIComponent(key)}`, opts);
+
+/** Legacy aliases (some API routes import these names) */
+export const ctFetch = request;
+export const ctGet   = get;
+export const ctPost  = post;
+
+/** Default export for wrappers that `import impl from '../src/lib/ct-rest'` */
+const impl = { API, request, get, post, getProduct, getProductByKey, ctFetch, ctGet, ctPost };
+export default impl;
