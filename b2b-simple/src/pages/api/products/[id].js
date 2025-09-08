@@ -1,46 +1,27 @@
-// pages/api/products/[id].js - Fixed to include prices
 export default async function handler(req, res) {
   const { id } = req.query;
-
-  if (!id) {
-    return res.status(400).json({ error: 'Missing product id in query' });
-  }
+  if (!id) return res.status(400).json({ error: "Missing product id in query" });
 
   try {
-    // Use central token helper and env-driven API base
-  const { getCTToken } = await import('../../../../lib/ctAuth.js');
-  const { API, buildPriceSelection } = await import('../../../../lib/ct-rest.js');
+    const { ctGet } = await import("@/lib/ct-rest");
 
-    const { access_token } = await getCTToken();
-    const qs = buildPriceSelection({}).toString();
-    const productRes = await fetch(
-      API(`/product-projections/${encodeURIComponent(id)}?${qs}`),
-      { headers: { Authorization: `Bearer ${access_token}` } }
-    );
+    // Build price selection (GBP/GB + optional customer group from cookie or query)
+    const sp = new URLSearchParams();
+    sp.set("staged", "true");              // show deltas before publish
+    sp.set("priceCurrency", "GBP");
+    sp.set("priceCountry", "GB");
 
-    if (!productRes.ok) {
-      const error = await productRes.text();
-      return res.status(productRes.status).json({ error });
-    }
+    const groupId =
+      req.cookies?.customerGroupId ||
+      (typeof req.query.priceCustomerGroup === "string" ? req.query.priceCustomerGroup : "");
+    if (groupId) sp.set("priceCustomerGroup", groupId);
 
-  const productData = await productRes.json();
+    const product = await ctGet(`/product-projections/${encodeURIComponent(id)}?${sp.toString()}`);
 
-    // The prices should already be in the response, but let's make sure
-    console.log('Product API response:', {
-      id: productData.id,
-      name: productData.name?.['en-GB'],
-      hasPrices: !!productData.masterVariant?.prices,
-      priceCount: productData.masterVariant?.prices?.length || 0,
-      prices: productData.masterVariant?.prices?.map(p => ({
-        amount: p.value.centAmount,
-        currency: p.value.currencyCode,
-        country: p.country
-      }))
-    });
-
-  return res.status(200).json(productData);
+    return res.status(200).json(product);
   } catch (err) {
-    console.error('Product API error:', err);
-    return res.status(500).json({ error: err.message });
+    // If ctGet throws with { status, body }, surface it to help debugging
+    const status = err?.status || 500;
+    return res.status(status).json({ error: err?.body || err?.message || "Product fetch failed" });
   }
 }

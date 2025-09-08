@@ -140,7 +140,7 @@ const ProductDownloads = ({ productId, downloads = [] }) => {
         <div style={{
           width: '40px',
           height: '40px',
-          backgroundColor: '#0d2340',
+          backgroundColor: '#0a0a0a',
           borderRadius: '8px',
           display: 'flex',
           alignItems: 'center',
@@ -158,7 +158,7 @@ const ProductDownloads = ({ productId, downloads = [] }) => {
           <h3 style={{
             fontSize: '18px',
             fontWeight: '700',
-            color: '#0d2340',
+            color: '#0a0a0a',
             marginBottom: '4px'
           }}>
             Product Downloads
@@ -232,7 +232,7 @@ const ProductDownloads = ({ productId, downloads = [] }) => {
                     <h4 style={{
                       fontSize: '14px',
                       fontWeight: '600',
-                      color: '#0d2340',
+                      color: '#0a0a0a',
                       margin: 0,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -286,7 +286,7 @@ const ProductDownloads = ({ productId, downloads = [] }) => {
                       disabled={isDownloading}
                       style={{
                         padding: '6px 12px',
-                        backgroundColor: isDownloading ? '#9ca3af' : '#0d2340',
+                        backgroundColor: isDownloading ? '#9ca3af' : '#0a0a0a',
                         color: '#ffffff',
                         border: 'none',
                         borderRadius: '6px',
@@ -306,7 +306,7 @@ const ProductDownloads = ({ productId, downloads = [] }) => {
                       }}
                       onMouseLeave={e => {
                         if (!isDownloading) {
-                          e.currentTarget.style.backgroundColor = '#0d2340';
+                          e.currentTarget.style.backgroundColor = '#0a0a0a';
                         }
                       }}
                     >

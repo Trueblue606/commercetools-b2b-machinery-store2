@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '@/components/navbar';
 import { useCart } from '../contexts/CartContext';
-import { getCTToken } from '../../../lib/ctAuth.js';
-import { API } from '../../../lib/ct-rest.js';
+import { getCTToken } from '@/lib/ctAuth';
+import { API } from '@/lib/ct-rest';
 
-const COLORS = { DARK_BLUE: '#0d2340', BABY_BLUE: '#d7e9f7' };
+const COLORS = { DARK_BLUE: '#0a0a0a', BABY_BLUE: '#d7e9f7' };
 const PRICE_CURRENCY = process.env.NEXT_PUBLIC_CT_PRICE_CURRENCY || 'GBP';
 const PRICE_COUNTRY  = process.env.NEXT_PUBLIC_CT_PRICE_COUNTRY  || 'GB';
 
@@ -172,12 +172,13 @@ export default function ProductDetail({ initialProduct, error }) {
 
   return (
     <>
-   
       <div style={{ maxWidth: 1200, margin: '40px auto', padding: 24, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
         <ProductImagesGallery images={mv?.images || (product.image ? [{ url: product.image }] : [])} />
 
         <div>
-          <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8 }}>{localise(product.name)}</h1>
+          <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, color: COLORS.DARK_BLUE }}>
+            {localise(product.name)}
+          </h1>
           <p style={{ color: '#6b7280' }}>SKU: {mv?.sku}</p>
 
           <p style={{ fontSize: 28, fontWeight: 700, color: COLORS.DARK_BLUE, marginTop: 16 }}>
@@ -190,22 +191,117 @@ export default function ProductDetail({ initialProduct, error }) {
 
           {product.description && (
             <div style={{ marginTop: 24 }}>
-              <h3>Description</h3>
+              <h3 style={{ color: COLORS.DARK_BLUE }}>Description</h3>
               <p>{localise(product.description)}</p>
             </div>
           )}
 
           {showPrices && (
             <div style={{ marginTop: 32 }}>
-              <label>Quantity</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-                <span>{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)}>+</button>
+              <label style={{ display: 'block', fontWeight: 600, color: COLORS.DARK_BLUE }}>Quantity</label>
+
+              {/* Row keeps +/- and Add button perfectly center-aligned */}
+              <div className="qtyRow">
+                {/* UI-only: glossy black quantity stepper (handlers unchanged) */}
+                <div className="qtyStepper" role="group" aria-label="Choose quantity">
+                  <button
+                    className="qtyBtn"
+                    aria-label="Decrease quantity"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                  >
+                    −
+                  </button>
+                  <span className="qtyValue" aria-live="polite">{quantity}</span>
+                  <button
+                    className="qtyBtn"
+                    aria-label="Increase quantity"
+                    onClick={() => setQuantity(quantity + 1)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  className="addBtn"
+                  onClick={handleAddToCart}
+                >
+                  {addedToCart ? 'Added!' : 'Add to Cart'}
+                </button>
               </div>
-              <button onClick={handleAddToCart} style={{ background: COLORS.DARK_BLUE, color: '#fff', padding: '12px 20px', borderRadius: 8 }}>
-                {addedToCart ? 'Added!' : 'Add to Cart'}
-              </button>
+
+              {/* PDP-scoped styles (UI only) */}
+              <style jsx>{`
+                .qtyRow {
+                  display: flex;
+                  align-items: center;      /* <-- perfect vertical centering */
+                  gap: 12px;
+                  margin: 8px 0 16px;
+                }
+                .qtyStepper {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 10px;
+                }
+                .qtyBtn {
+                  width: 36px;
+                  height: 36px;
+                  border-radius: 10px;
+                  border: 1px solid #374151; /* border-gray-700 */
+                  color: #fff;
+                  background-image: linear-gradient(to bottom, #1f2937, #0a0a0a); /* from-gray-800 to-black */
+                  box-shadow: 0 10px 18px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.05);
+                  font-size: 18px;
+                  font-weight: 800;
+                  line-height: 1;
+                  cursor: pointer;
+                  transition: transform .06s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+                }
+                .qtyBtn:hover {
+                  background-image: linear-gradient(to bottom, #374151, #111827); /* hover from-gray-700 to-gray-900 */
+                  border-color: #374151;
+                }
+                .qtyBtn:active {
+                  background-image: linear-gradient(to bottom, #000000, #1f2937); /* active from-black to-gray-800 */
+                  transform: translateY(1px);
+                }
+                .qtyBtn:disabled {
+                  background-image: linear-gradient(to bottom, #4b5563, #374151); /* disabled from-gray-600 to-gray-700 */
+                  opacity: .5;
+                  cursor: not-allowed;
+                }
+                .qtyValue {
+                  min-width: 38px;
+                  text-align: center;
+                  font-size: 16px;
+                  font-weight: 700;
+                  color: ${COLORS.DARK_BLUE};
+                }
+                .addBtn {
+                  height: 36px;                   /* <-- same height as buttons */
+                  padding: 0 18px;               /* vertical middle */
+                  border-radius: 10px;
+                  border: 1px solid #1f2937;
+                  background: ${COLORS.DARK_BLUE};
+                  color: #fff;
+                  font-weight: 700;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow: 0 10px 18px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.05);
+                  cursor: pointer;
+                  transition: transform .06s ease, background .2s ease, box-shadow .2s ease;
+                }
+                .addBtn:hover {
+                  background: #111827;
+                }
+                .addBtn:active {
+                  transform: translateY(1px);
+                }
+                @media (hover: none) {
+                  .qtyBtn:hover { background-image: linear-gradient(to bottom, #1f2937, #0a0a0a); }
+                }
+              `}</style>
             </div>
           )}
         </div>

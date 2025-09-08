@@ -233,14 +233,14 @@ function ProductVariantsSelector({ product, onVariantChange, customer }) {
         gap: '8px',
         marginBottom: '20px'
       }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d2340" strokeWidth="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="2">
           <circle cx="12" cy="12" r="3"></circle>
           <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
         </svg>
         <h3 style={{
           fontSize: '16px',
           fontWeight: '600',
-          color: '#0d2340',
+          color: '#0a0a0a',
           margin: 0
         }}>
           Product Options
@@ -282,9 +282,9 @@ function ProductVariantsSelector({ product, onVariantChange, customer }) {
                     disabled={!isAvailable}
                     style={{
                       padding: '8px 12px',
-                      backgroundColor: isSelected ? '#0d2340' : (isAvailable ? '#ffffff' : '#f8f9fa'),
+                      backgroundColor: isSelected ? '#0a0a0a' : (isAvailable ? '#ffffff' : '#f8f9fa'),
                       color: isSelected ? '#ffffff' : (isAvailable ? '#374151' : '#9ca3af'),
-                      border: `1px solid ${isSelected ? '#0d2340' : (isAvailable ? '#d1d5db' : '#e5e7eb')}`,
+                      border: `1px solid ${isSelected ? '#0a0a0a' : (isAvailable ? '#d1d5db' : '#e5e7eb')}`,
                       borderRadius: '6px',
                       fontSize: '12px',
                       fontWeight: '500',
@@ -296,7 +296,7 @@ function ProductVariantsSelector({ product, onVariantChange, customer }) {
                     }}
                     onMouseEnter={e => {
                       if (isAvailable && !isSelected) {
-                        e.currentTarget.style.borderColor = '#0d2340';
+                        e.currentTarget.style.borderColor = '#0a0a0a';
                         e.currentTarget.style.backgroundColor = '#f8fafe';
                       }
                     }}
@@ -339,7 +339,7 @@ function ProductVariantsSelector({ product, onVariantChange, customer }) {
                 <span style={{
                   fontSize: '14px',
                   fontWeight: '600',
-                  color: '#0d2340'
+                  color: '#0a0a0a'
                 }}>
                   {getVariantPrice(selectedVariant)}
                 </span>

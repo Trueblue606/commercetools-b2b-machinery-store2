@@ -140,6 +140,6 @@ const inputStyle = {
   borderRadius: 12, backgroundColor: "#f8fafe", border: "none",
 };
 const buttonStyle = {
-  width: "100%", padding: 16, backgroundColor: "#0d2340",
+  width: "100%", padding: 16, backgroundColor: "#0a0a0a",
   color: "#fff", border: "none", borderRadius: 12, fontWeight: 700,
 };

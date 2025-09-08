@@ -6,7 +6,7 @@ import DashboardContent from "../components/components/DashboardContent";
 
 // Keep this export because DashboardContent imports it from "../account"
 export const COLORS = {
-  DARK_BLUE: "#0d2340",
+  DARK_BLUE: "#0a0a0a",
   BABY_BLUE: "#d7e9f7",
   LIGHT_GRAY: "#f8f9fa",
 };

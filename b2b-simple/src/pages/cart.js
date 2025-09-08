@@ -52,10 +52,9 @@ export default function Cart() {
   if (loading) {
     return (
       <>
-       
         <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-            <div style={{ display: 'inline-block', width: '50px', height: '50px', border: '4px solid #e5e7eb', borderTop: '4px solid #0d2340', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+            <div style={{ display: 'inline-block', width: '50px', height: '50px', border: '4px solid #e5e7eb', borderTop: '4px solid #0a0a0a', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
             <p style={{ marginTop: '16px', color: '#6b7280' }}>Loading cart...</p>
           </div>
         </div>
@@ -69,12 +68,11 @@ export default function Cart() {
   if (error) {
     return (
       <>
-       
         <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
             <h1 style={{ color: '#ef4444', marginBottom: '16px' }}>Error Loading Cart</h1>
             <p style={{ color: '#6b7280', marginBottom: '24px' }}>{error}</p>
-            <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', backgroundColor: '#0d2340', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}>Try Again</button>
+            <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', backgroundColor: '#0a0a0a', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontFamily: "'Outfit', sans-serif" }}>Try Again</button>
           </div>
         </div>
       </>
@@ -84,10 +82,9 @@ export default function Cart() {
   if (lineItems.length === 0) {
     return (
       <>
-      
         <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#0d2340', marginBottom: '32px' }}>Shopping Cart</h1>
+            <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#0a0a0a', marginBottom: '32px' }}>Shopping Cart</h1>
             <div style={{ textAlign: 'center', padding: '80px 20px', backgroundColor: '#f9fafb', borderRadius: '12px' }}>
               <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1" style={{ margin: '0 auto 24px' }}>
                 <circle cx="9" cy="21" r="1"></circle>
@@ -96,7 +93,7 @@ export default function Cart() {
               </svg>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#374151', marginBottom: '16px' }}>Your cart is empty</h2>
               <p style={{ color: '#6b7280', marginBottom: '32px' }}>Start shopping to add items to your cart</p>
-              <Link href="/" style={{ display: 'inline-block', padding: '12px 24px', backgroundColor: '#0d2340', color: '#fff', textDecoration: 'none', borderRadius: '8px', fontWeight: '600', transition: 'all 0.2s' }}>
+              <Link href="/" style={{ display: 'inline-block', padding: '12px 24px', backgroundColor: '#0a0a0a', color: '#fff', textDecoration: 'none', borderRadius: '8px', fontWeight: '600', transition: 'all 0.2s' }}>
                 Continue Shopping
               </Link>
             </div>
@@ -109,14 +106,13 @@ export default function Cart() {
   // ===== MAIN UI =====
   return (
     <>
-   
       <div style={{ backgroundColor: '#fff', minHeight: 'calc(100vh - 64px)', fontFamily: "'Outfit', sans-serif", padding: '32px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
           
           {/* Header */}
           <div style={{ marginBottom: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#0d2340' }}>
+              <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#0a0a0a' }}>
                 Shopping Cart ({totalItems} {totalItems === 1 ? 'item' : 'items'})
               </h1>
               {lineItems.length > 0 && (
@@ -172,7 +168,7 @@ export default function Cart() {
                     )}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#0d2340', marginBottom: '8px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#0a0a0a', marginBottom: '8px' }}>
                       {item.name?.['en-GB'] || item.name?.['en'] || 'Product'}
                     </h3>
                     <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '16px' }}>
@@ -181,14 +177,34 @@ export default function Cart() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '14px', fontWeight: '500' }}>Qty:</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>−</button>
-                          <span style={{ fontSize: '16px', fontWeight: '600', minWidth: '30px', textAlign: 'center' }}>{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+
+                        {/* === POLISHED GLOSSY BLACK STEPPER (UI ONLY) === */}
+                        <div className="qtyStepper">
+                          <button
+                            className="qtyBtn"
+                            aria-label="Decrease quantity"
+                            title="Decrease"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
+                          >
+                            −
+                          </button>
+
+                          <span className="qtyValue">{item.quantity}</span>
+
+                          <button
+                            className="qtyBtn"
+                            aria-label="Increase quantity"
+                            title="Increase"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          >
+                            +
+                          </button>
                         </div>
+                        {/* === END STEPPER === */}
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <p style={{ fontSize: '18px', fontWeight: '700', color: '#0d2340', marginBottom: '8px' }}>
+                        <p style={{ fontSize: '18px', fontWeight: '700', color: '#0a0a0a', marginBottom: '8px' }}>
                           {cc} {((item.totalPrice?.centAmount || 0) / 100).toFixed(2)}
                         </p>
                         <button onClick={() => removeFromCart(item.id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}>
@@ -203,7 +219,7 @@ export default function Cart() {
 
             {/* Order Summary */}
             <div style={{ padding: '24px', backgroundColor: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb', height: 'fit-content', position: 'sticky', top: '100px' }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0d2340', marginBottom: '24px' }}>Order Summary</h2>
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0a0a0a', marginBottom: '24px' }}>Order Summary</h2>
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span style={{ color: '#6b7280' }}>Subtotal ({selectedItemCount || totalItems} items)</span>
@@ -224,23 +240,74 @@ export default function Cart() {
                 )}
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
-                <span style={{ fontSize: '18px', fontWeight: '700', color: '#0d2340' }}>Total</span>
-                <span style={{ fontSize: '18px', fontWeight: '700', color: '#0d2340' }}>{formattedTotal}</span>
+                <span style={{ fontSize: '18px', fontWeight: '700', color: '#0a0a0a' }}>Total</span>
+                <span style={{ fontSize: '18px', fontWeight: '700', color: '#0a0a0a' }}>{formattedTotal}</span>
               </div>
               <button
                 disabled={(selectedItemCount || 0) === 0 && !lineItems.length}
-                style={{ width: '100%', padding: '16px', backgroundColor: ((selectedItemCount || 0) === 0 && !lineItems.length) ? '#9ca3af' : '#0d2340', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600', cursor: ((selectedItemCount || 0) === 0 && !lineItems.length) ? 'not-allowed' : 'pointer', marginTop: '16px' }}
+                style={{ width: '100%', padding: '16px', backgroundColor: ((selectedItemCount || 0) === 0 && !lineItems.length) ? '#9ca3af' : '#0a0a0a', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600', cursor: ((selectedItemCount || 0) === 0 && !lineItems.length) ? 'not-allowed' : 'pointer', marginTop: '16px' }}
                 onClick={() => { if ((selectedItemCount || 0) > 0 || lineItems.length) router.push('/checkout'); }}
               >
                 Checkout ({selectedItemCount || totalItems} {(selectedItemCount || totalItems) === 1 ? 'item' : 'items'})
               </button>
-              <Link href="/" style={{ display: 'block', textAlign: 'center', color: '#0d2340', textDecoration: 'none', fontSize: '14px', fontWeight: '500', marginTop: '12px' }}>
+              <Link href="/" style={{ display: 'block', textAlign: 'center', color: '#0a0a0a', textDecoration: 'none', fontSize: '14px', fontWeight: '500', marginTop: '12px' }}>
                 ← Continue Shopping
               </Link>
             </div>
 
           </div>
         </div>
+
+        {/* Scoped styles for glossy black quantity buttons (UI only) */}
+        <style jsx>{`
+          .qtyStepper {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .qtyBtn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;                 /* rounded-lg */
+            border: 1px solid #374151;            /* border-gray-700 */
+            color: #ffffff;                       /* text-white */
+            background: linear-gradient(to bottom, #1f2937, #0a0a0a); /* from-gray-800 to jet-black */
+            box-shadow:
+              0 10px 18px rgba(0,0,0,0.20),      /* shadow-lg */
+              inset 0 1px 0 rgba(255,255,255,0.05); /* shadow-inner subtle highlight */
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            transition: transform .06s ease, box-shadow .2s ease, filter .2s ease, background .2s ease, border-color .2s ease;
+          }
+          .qtyBtn:hover {
+            background: linear-gradient(to bottom, #374151, #111827); /* hover:from-gray-700 hover:to-gray-900 */
+            border-color: #374151;
+          }
+          .qtyBtn:active {
+            background: linear-gradient(to bottom, #000000, #1f2937); /* active:from-black active:to-gray-800 */
+            transform: translateY(1px);
+          }
+          .qtyBtn:disabled {
+            background: linear-gradient(to bottom, #4b5563, #374151); /* disabled:from-gray-600 disabled:to-gray-700 */
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+          }
+          .qtyValue {
+            min-width: 38px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0a0a0a;
+          }
+          @media (hover: none) {
+            .qtyBtn:hover {
+              background: linear-gradient(to bottom, #1f2937, #0a0a0a);
+            }
+          }
+        `}</style>
       </div>
     </>
   );
