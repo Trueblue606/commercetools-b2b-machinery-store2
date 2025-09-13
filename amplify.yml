@@ -5,8 +5,21 @@ applications:
       phases:
         preBuild:
           commands:
-            - nvm install 20 >/dev/null || true
+            - nvm install 20
             - nvm use 20
+            # Write server + client env so SSR lambdas always see them
+            - printf "%s\n" \
+                "CT_PROJECT_KEY=${CT_PROJECT_KEY}" \
+                "CT_CLIENT_ID=${CT_CLIENT_ID}" \
+                "CT_CLIENT_SECRET=${CT_CLIENT_SECRET}" \
+                "CT_AUTH_URL=${CT_AUTH_URL}" \
+                "CT_API_URL=${CT_API_URL}" \
+                "CT_SCOPE=${CT_SCOPE}" \
+                "CT_SCOPES=${CT_SCOPES}" \
+                "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-/api}" \
+                "NEXT_PUBLIC_CT_PRICE_COUNTRY=${NEXT_PUBLIC_CT_PRICE_COUNTRY:-GB}" \
+                "NEXT_PUBLIC_CT_PRICE_CURRENCY=${NEXT_PUBLIC_CT_PRICE_CURRENCY:-GBP}" \
+              > .env.production
             - npm ci
         build:
           commands:
@@ -18,3 +31,4 @@ applications:
       cache:
         paths:
           - node_modules/**/*
+          - .next/cache/**/*
