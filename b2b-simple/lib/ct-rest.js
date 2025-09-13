@@ -1,25 +1,41 @@
 /**
- * Compatibility layer for legacy imports of ../../lib/ctRest and @/lib/ct-rest
- * Re-exports the modern implementation and provides legacy-named helpers.
+ * Compatibility layer for legacy imports.
+ * We import * as impl to avoid requiring specific named exports from src/lib/ct-rest.js.
+ * Then we provide the expected surface (request/get/post/getProduct/getProductByKey),
+ * delegating to whatever the new module exposes, or falling back to simple wrappers.
  */
-import * as impl from '../src/lib/ct-rest.js';
-export * from '../src/lib/ct-rest.js';
+import * as impl from "../src/lib/ct-rest.js";
 
-// Legacy helpers expected by older code. We try to wire them to modern funcs.
+const _request =
+  impl.request ||
+  impl.default?.request ||
+  ((method, url, opts = {}) => {
+    // Defer to fetch-based request if available
+    if (impl.fetchRequest) return impl.fetchRequest(method, url, opts);
+    throw new Error("ct-rest: request() not available in impl");
+  });
+
+export const request = (...args) => _request(...args);
 
 export const get =
   impl.get ||
-  (impl.request ? ((url, opts) => impl.request('GET', url, opts)) : undefined);
+  impl.default?.get ||
+  ((url, opts = {}) => _request("GET", url, opts));
 
 export const post =
   impl.post ||
-  (impl.request ? ((url, body, opts) => impl.request('POST', url, { body, ...(opts||{}) })) : undefined);
+  impl.default?.post ||
+  ((url, body, opts = {}) =>
+    _request("POST", url, { ...opts, body: typeof body === "string" ? body : JSON.stringify(body) }));
+
+export const getProduct =
+  impl.getProduct ||
+  impl.default?.getProduct ||
+  ((id) => get(`/products/${id}`));
 
 export const getProductByKey =
   impl.getProductByKey ||
-  (impl.getProduct ? ((key, opts) => impl.getProduct({ key }, opts)) :
-   (impl.get ? ((key, opts) => impl.get(`/products/key=${encodeURIComponent(key)}`, opts)) :
-    undefined));
+  impl.default?.getProductByKey ||
+  ((key) => get(`/product-projections/key=${encodeURIComponent(key)}`));
 
-// Preserve default if the modern module has one
-export default impl.default ?? undefined;
+export default { request, get, post, getProduct, getProductByKey };
