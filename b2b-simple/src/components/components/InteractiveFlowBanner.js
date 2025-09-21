@@ -48,13 +48,13 @@ const SWEEP_DURATION_S = 20;     // slower, more elegant
 const REFINED_BG_PRESETS = {
   corporateSlate:
     `radial-gradient(1200px circle at 50% -20%, rgba(255,255,255,${VIGNETTE_OPACITY}) 0%, transparent 50%),
-     linear-gradient(135deg, #0f172a 0%, #0b1223 40%, #0a0f1e 70%, #0b1223 100%)`,
+     linear-gradient(135deg, #0f172a 0%, #000000ff 40%, #0a0f1e 70%, #0a0b0bff 100%)`,
   royalIndigo:
     `radial-gradient(1000px circle at 50% -15%, rgba(47,130,255,${VIGNETTE_OPACITY}) 0%, transparent 55%),
-     linear-gradient(135deg, #0a3d91 0%, #0b2c6b 35%, #091d4b 65%, #0b2c6b 100%)`,
+     linear-gradient(135deg, #01050dff 0%, #0e0f0fff 35%, #010101ff 65%, #000000ff 100%)`,
   charcoalGlass:
     `radial-gradient(1100px circle at 50% -18%, rgba(255,255,255,${VIGNETTE_OPACITY}) 0%, transparent 52%),
-     linear-gradient(135deg, #0e141b 0%, #0b1223 38%, #0a0f1e 68%, #0b1223 100%)`,
+     linear-gradient(135deg, #0e141b 0%, #000000ff 38%, #0a0f1e 68%, #0a0a0a 100%)`,
 };
 
 const HERO_BG = REFINED_BG_PRESETS.corporateSlate;
@@ -69,7 +69,7 @@ const TAGLINE = (
 );
 
 const steps = [
-  { icon: 'Database', title: 'X3',                 subtitle: 'ERP System of Record' },
+  { icon: 'Database', title: 'ERP Systems',                 subtitle: 'ERP System of Record' },
   { icon: 'Zap',      title: 'Delta Sync',         subtitle: 'Changes-Only, Overlap-Safe' },
   { icon: 'Globe',    title: 'commercetools',      subtitle: 'Composable B2B Core' },
   { icon: 'Monitor',  title: 'Next.js Storefront', subtitle: 'Eligibility & Orders' },

@@ -92,7 +92,7 @@ export default function TestPrices() {
           disabled={loading}
           style={{
             padding: '8px 16px',
-            backgroundColor: '#0d2340',
+            backgroundColor: '#0a0a0a',
             color: 'white',
             border: 'none',
             borderRadius: '4px',
