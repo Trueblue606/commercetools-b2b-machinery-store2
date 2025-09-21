@@ -109,7 +109,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
             style={{
               fontSize: '28px',
               fontWeight: '800',
-              color: '#0d2340',
+              color: '#0a0a0a',
               textDecoration: 'none',
               letterSpacing: '-1px',
               display: 'flex',
@@ -134,7 +134,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                 fontWeight: 500,
                 fontSize: '14px',
                 fontFamily: "'Outfit', sans-serif",
-                color: '#0d2340',
+                color: '#0a0a0a',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
@@ -167,7 +167,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
               border: '1.5px solid #d7e9f7',
               cursor: 'pointer',
               textDecoration: 'none',
-              color: '#0d2340',
+              color: '#0a0a0a',
             }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -180,7 +180,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                 position: 'absolute',
                 top: '-10px',
                 right: '-10px',
-                backgroundColor: '#0d2340',
+                backgroundColor: '#0a0a0a',
                 color: '#ffffff',
                 borderRadius: '50%',
                 minWidth: '22px',
@@ -222,7 +222,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#0d2340',
+                    color: '#0a0a0a',
                     fontWeight: '600',
                     fontSize: '14px',
                   }}
@@ -230,7 +230,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                   {customer.firstName?.[0]?.toUpperCase()}
                 </div>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#0d2340' }}>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#0a0a0a' }}>
                     {customer.firstName}
                   </div>
                   <div style={{ fontSize: '12px', color: '#6b7280' }}>
@@ -248,7 +248,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
                   padding: '8px 16px',
                   fontWeight: 500,
                   fontSize: '14px',
-                  color: '#0d2340',
+                  color: '#0a0a0a',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -268,7 +268,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
               <Link href="/login" style={{ padding: '10px 20px', border: '1.5px solid #d7e9f7', borderRadius: '8px' }}>
                 Login
               </Link>
-              <Link href="/signup" style={{ padding: '10px 20px', backgroundColor: '#0d2340', color: '#fff', borderRadius: '8px' }}>
+              <Link href="/signup" style={{ padding: '10px 20px', backgroundColor: '#0a0a0a', color: '#fff', borderRadius: '8px' }}>
                 Get Started
               </Link>
             </>
@@ -280,15 +280,15 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
         <div style={{ backgroundColor: '#d7e9f7', padding: '10px 0', borderTop: '1px solid #bfd9f2' }}>
           <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-              <span style={{ fontSize: '13px', color: '#0d2340', fontWeight: '500' }}>
+              <span style={{ fontSize: '13px', color: '#0a0a0a', fontWeight: '500' }}>
                 🎯 {customerGroup.label} Pricing Active
               </span>
-              <span style={{ fontSize: '13px', color: '#0d2340' }}>
+              <span style={{ fontSize: '13px', color: '#0a0a0a' }}>
                 • {customerGroup.key === 'contractA' ? 'Contract pricing applied' : 'Standard pricing'}
               </span>
-              <span style={{ fontSize: '13px', color: '#0d2340' }}>• Free Shipping on Orders Over £500</span>
+              <span style={{ fontSize: '13px', color: '#0a0a0a' }}>• Free Shipping on Orders Over £500</span>
             </div>
-            <Link href="/account" style={{ fontSize: '13px', color: '#0d2340', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Link href="/account" style={{ fontSize: '13px', color: '#0a0a0a', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
               View Account Benefits
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="9 18 15 12 9 6" />

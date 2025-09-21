@@ -221,7 +221,7 @@ export default function DashboardContent({ customer, orders: ordersProp = [], on
         <div style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
             <h1 style={{ fontSize: 32, fontWeight: 700, color: COLORS.DARK_BLUE, margin: 0 }}>Welcome, {customerFirstName}</h1>
-            <span title={`${groupInfo.label} pricing active`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 999, fontSize: 12, fontWeight: 600, color: '#0d2340', backgroundColor: COLORS.BABY_BLUE }}>
+            <span title={`${groupInfo.label} pricing active`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 999, fontSize: 12, fontWeight: 600, color: '#0a0a0a', backgroundColor: COLORS.BABY_BLUE }}>
               🎯 {groupInfo.label} Pricing
             </span>
           </div>
@@ -402,7 +402,7 @@ export default function DashboardContent({ customer, orders: ordersProp = [], on
             <div style={{ marginBottom: 32 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <h3 style={{ fontSize: 18, fontWeight: 600, color: COLORS.DARK_BLUE }}>Your Benefits</h3>
-                <div style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 8px', borderRadius: 12, fontSize: 12, fontWeight: 600, backgroundColor: COLORS.BABY_BLUE, color: '#0d2340' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 8px', borderRadius: 12, fontSize: 12, fontWeight: 600, backgroundColor: COLORS.BABY_BLUE, color: '#0a0a0a' }}>
                   {customerBenefits.tier}
                 </div>
               </div>
