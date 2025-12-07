@@ -117,7 +117,7 @@ export default function Navbar({ onToggleFilters, hideBenefitsBar = false }) {
               gap: '8px',
             }}
           >
-            Chempilot
+            MACH MODEL B2B (Packaging Demo)
           </Link>
 
           {onToggleFilters && (
