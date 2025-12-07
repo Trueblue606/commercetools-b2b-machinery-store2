@@ -60,19 +60,19 @@ const REFINED_BG_PRESETS = {
 const HERO_BG = REFINED_BG_PRESETS.corporateSlate;
 
 /* ---------- Copy ---------- */
-const TITLE   = 'Scoped B2B POC: Real-Time, ERP-Aligned Contract Pricing';
+const TITLE   = 'Scoped B2B POC: Contract-Style Pricing (Demo Data)';
 const TAGLINE = (
   <>
-    Specials, multi-priced SKUs, native customer groups — solved. <br />
-    Real-time Delta updates, no nightly dumps, overlap-safe.
+    Specials, multi-priced SKUs, customer groups — demoed. <br />
+    Simulated delta updates — not nightly dumps.
   </>
 );
 
 const steps = [
-  { icon: 'Database', title: 'ERP Systems',                 subtitle: 'ERP System of Record' },
-  { icon: 'Zap',      title: 'Delta Sync',         subtitle: 'Changes-Only, Overlap-Safe' },
-  { icon: 'Globe',    title: 'commercetools',      subtitle: 'Composable B2B Core' },
-  { icon: 'Monitor',  title: 'Next.js Storefront', subtitle: 'Eligibility & Orders' },
+  { icon: 'Database', title: 'ERP-Style Source',                 subtitle: 'Demo System of Record' },
+  { icon: 'Zap',      title: 'Delta-Style Sync',         subtitle: 'Changes-Only Overlap-Safe (Demo)' },
+  { icon: 'Globe',    title: 'MACH Model Demo',      subtitle: 'Composable B2B Core (PoC)' },
+  { icon: 'Monitor',  title: 'Next.js Storefront', subtitle: 'Eligibility & Order Flow' },
 ];
 
 export default function InteractiveFlowBanner() {
